@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Dashboard</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  .greet{display:flex;align-items:flex-start;justify-content:space-between;gap:24px;margin-bottom:22px;flex-wrap:wrap}
+  .greet h1{font-size:30px;font-weight:600;letter-spacing:-.025em}
+  .greet .date{color:var(--ink-3);font-size:14.5px;margin-top:5px}
+  .greet .date b{color:var(--ink-2);font-weight:500}
+  .hero-chips{display:flex;gap:12px}
+  .hchip{background:var(--surface);border:1px solid var(--line);border-radius:13px;padding:13px 17px;min-width:118px}
+  .hchip .lab{font-family:var(--mono);font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);margin-bottom:7px;white-space:nowrap}
+  .hchip .v{display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .hchip .v b{font-size:22px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .hchip.streak{background:var(--gold-s);border-color:#F0DDB0}.hchip.streak .v b{color:var(--h-good-d)}
+  .hchip .fl{font-size:18px}
+  .hchip .lvbar{height:5px;border-radius:3px;background:var(--i50);overflow:hidden;margin-top:9px;width:118px}
+  .hchip .lvbar>i{display:block;height:100%;background:linear-gradient(90deg,var(--i400),var(--iris))}
+
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.1fr 1fr;gap:20px;align-items:stretch;margin-bottom:22px}
+  @media(max-width:980px){.hero{grid-template-columns:1fr}}
+  .wheel-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:18px 20px 12px;position:relative;overflow:hidden}
+  .wheel-card::before{content:"";position:absolute;top:-80px;right:-60px;width:240px;height:240px;border-radius:50%;background:radial-gradient(circle,var(--i50),transparent 70%)}
+  .wc-head{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
+  .wc-head h2{font-size:15px;font-weight:600;white-space:nowrap}
+  .wc-head .bal{font-size:12.5px;color:var(--ink-3)}.wc-head .bal b{color:var(--iris);font-weight:600}
+  .wheel-wrap{display:flex;justify-content:center;align-items:center;position:relative;z-index:1;margin-top:4px}
+  .wedge{cursor:pointer;transition:opacity .15s}
+  .wheel-wrap:hover .wedge{opacity:.45}
+  .wheel-wrap .wedge:hover{opacity:1}
+  .wedge.track{cursor:default}.wheel-wrap:hover .wedge.track{opacity:1}
+  .wlabel{cursor:pointer}
+  .wleg{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;margin-top:6px;position:relative;z-index:1;padding:0 6px}
+  .wleg .li{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
+  .wleg .li .d{width:8px;height:8px;border-radius:3px}
+
+  /* right stack */
+  .rstack{display:flex;flex-direction:column;gap:16px}
+  .focus-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);overflow:hidden;flex:1;display:flex;flex-direction:column}
+  .fc-top{padding:15px 18px;background:linear-gradient(100deg,var(--i50),var(--surface));border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .fc-top .l{display:flex;align-items:center;gap:11px}
+  .fc-top .sun{width:36px;height:36px;border-radius:10px;background:var(--surface);border:1px solid var(--line-2);display:flex;align-items:center;justify-content:center;color:var(--iris)}
+  .fc-top .sun svg{width:19px;height:19px;stroke-width:1.7}
+  .fc-top h3{font-size:14.5px;font-weight:600;white-space:nowrap}.fc-top p{font-size:12px;color:var(--ink-3);margin-top:1px}
+  .fc-list{padding:6px 8px;flex:1}
+  .frow{display:flex;align-items:center;gap:11px;padding:9px 10px;border-radius:9px;transition:.15s}
+  .frow:hover{background:var(--surface-2)}
+  .fcheck{width:20px;height:20px;border-radius:6px;border:1.6px solid var(--line-3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .fcheck.done{background:var(--iris);border-color:var(--iris)}.fcheck svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0}.fcheck.done svg{opacity:1}
+  .frow .ft{flex:1;font-size:13.5px;font-weight:500;min-width:0}
+  .fcheck.done~.ft{text-decoration:line-through;color:var(--ink-3)}
+  .frow .fa{font-size:14px}
+  .fc-foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;align-items:center;justify-content:space-between}
+  .fc-foot .prog{font-size:12.5px;color:var(--ink-2)}.fc-foot .prog b{color:var(--iris)}
+
+  .neg-strip{background:linear-gradient(180deg,var(--h-crit-s),var(--surface) 80%);border:1px solid #F0CFCB;border-radius:var(--r-lg);padding:14px 16px;display:flex;align-items:center;gap:13px}
+  .neg-strip .em{font-size:22px;flex-shrink:0}
+  .neg-strip .ni{flex:1}.neg-strip .ni .t{font-size:13.5px;font-weight:600}.neg-strip .ni .d{font-size:12px;color:var(--h-crit-d);margin-top:1px}
+  .neg-strip a{font-size:12.5px;color:#fff;background:var(--h-crit);padding:7px 13px;border-radius:8px;text-decoration:none;font-weight:500;white-space:nowrap}
+
+  /* areas grid w/ sparklines */
+  .block-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:13px}
+  .block-head h2{font-size:16px;font-weight:600;white-space:nowrap}
+  .block-head .link{font-size:13px;color:var(--iris);text-decoration:none;display:flex;align-items:center;gap:4px;white-space:nowrap}
+  .block-head .link svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+  .areas-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media(max-width:980px){.areas-grid{grid-template-columns:repeat(2,1fr)}}
+  .acard{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:15px;transition:.18s;cursor:pointer;position:relative;text-decoration:none;display:block;color:inherit}
+  .acard:hover{transform:translateY(-2px);border-color:var(--iris)}
+  .acard.neg{border-color:#F0CFCB}
+  .ac-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .ac-ic{width:34px;height:34px;border-radius:9px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:17px}
+  .ac-nm{font-size:14px;font-weight:500}
+  .ac-spark{margin:9px 0 4px}
+  .ac-foot{display:flex;align-items:center;justify-content:space-between;font-size:11.5px;color:var(--ink-3)}
+  .neg-pulse{position:absolute;top:13px;right:50px;width:7px;height:7px;border-radius:50%;background:var(--h-crit);animation:pulse 2s infinite}
+
+  .grid2{display:grid;grid-template-columns:1.3fr 1fr;gap:20px;margin-top:22px}
+  @media(max-width:980px){.grid2{grid-template-columns:1fr}}
+  .rail-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+  .rc-head{display:flex;align-items:center;gap:9px;margin-bottom:14px}
+  .rc-head .ic{width:30px;height:30px;border-radius:9px;display:flex;align-items:center;justify-content:center}
+  .rc-head .ic svg{width:16px;height:16px;stroke-width:1.8;fill:none}.rc-head h3{font-size:14px;font-weight:600;white-space:nowrap}
+  .wk-stat{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+  .wk-stat b{font-size:30px;font-weight:600;letter-spacing:-.02em}
+  .wk-delta{font-size:12.5px;font-weight:500;color:var(--h-exc-d);background:var(--h-exc-s);padding:2px 8px;border-radius:6px}
+  .wk-chart{display:flex;align-items:flex-end;gap:8px;height:74px}
+  .wk-bar{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .wk-bar .bar{width:100%;border-radius:5px 5px 3px 3px;background:var(--i200);min-height:5px;transition:.3s}
+  .wk-bar.today .bar{background:var(--iris)}
+  .wk-bar .dl{font-family:var(--mono);font-size:10px;color:var(--ink-4)}.wk-bar.today .dl{color:var(--iris);font-weight:500}
+  .ach-row{display:flex;align-items:center;gap:11px;padding:9px 0;border-top:1px solid var(--line)}
+  .ach-row:first-of-type{border-top:none}
+  .medal{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0}
+  .medal.on{background:radial-gradient(circle at 35% 30%,#F6D98B,var(--gold));box-shadow:inset 0 0 0 2.5px rgba(255,255,255,.5)}
+  .medal.off{background:var(--surface-2);box-shadow:inset 0 0 0 2px var(--line);font-size:15px;opacity:.7}
+  .ach-row .ai{flex:1}.ach-row .ai .t{font-size:13px;font-weight:500}.ach-row .ai .d{font-size:11.5px;color:var(--ink-3)}
+  .ach-row .miniprog{width:54px;height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden}.ach-row .miniprog>i{display:block;height:100%;background:var(--gold)}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<template id="tpl-main">
+  <div class="greet">
+    <div><h1 id="greetTitle">Günaydın, Begüm.</h1>
+      <div class="date">Pazartesi, <b>2 Haziran 2026</b> · Hayatın bugün dengede mi?</div></div>
+    <div class="hero-chips">
+      <div class="hchip streak"><div class="lab">Streak</div><div class="v"><span class="fl">🔥</span><b class="tnum">7</b><span style="font-size:12px;color:var(--h-good-d)">gün</span></div></div>
+      <div class="hchip"><div class="lab">Seviye 4 · Kâşif</div><div class="v"><b class="tnum">2.450</b><span style="font-size:12px;color:var(--ink-3)">/3.000</span></div><div class="lvbar"><i style="width:82%"></i></div></div>
+    </div>
+  </div>
+
+  <div class="hero">
+    <div class="wheel-card">
+      <div class="wc-head"><h2>Yaşam Dengesi</h2><div class="bal">Denge skoru <b id="balScore">54</b>/100</div></div>
+      <div class="wheel-wrap" id="wheelWrap"></div>
+      <div class="wleg" id="wleg"></div>
+    </div>
+    <div class="rstack">
+      <div class="focus-card">
+        <div class="fc-top"><div class="l"><div class="sun" id="focusSun"></div><div><h3>Bugünün odağı</h3><p>5 görevden 3'ünü öne çıkardım</p></div></div>
+          <a class="btn pri sm" href="07-daily-pool.html">Günü başlat</a></div>
+        <div class="fc-list" id="focusList"></div>
+        <div class="fc-foot"><span class="prog"><b>1</b>/5 tamam</span><a class="link" href="07-daily-pool.html" style="font-size:12.5px;color:var(--ink-3);text-decoration:none">Havuzu aç →</a></div>
+      </div>
+      <div class="neg-strip" id="negStrip"></div>
+    </div>
+  </div>
+
+  <div class="block-head"><h2>Alanların</h2><a class="link" href="03-areas.html">Tümü (8) <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+  <div class="areas-grid" id="areasGrid"></div>
+
+  <div class="grid2">
+    <div class="rail-card">
+      <div class="rc-head"><div class="ic" style="background:var(--i50);color:var(--iris)" id="wkIc"></div><h3>Bu hafta</h3></div>
+      <div class="wk-stat"><b class="tnum">35</b><span style="color:var(--ink-3);font-size:13px">görev tamamlandı</span><span class="wk-delta">↑ %20</span></div>
+      <div class="wk-chart" id="wkChart"></div>
+    </div>
+    <div class="rail-card">
+      <div class="rc-head"><div class="ic" style="background:var(--gold-s);color:var(--gold)" id="achIc"></div><h3>Başarılar</h3></div>
+      <div id="achList"></div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-empty">
+  <div class="state-block">
+    <div class="state-art" id="emptyArt"></div>
+    <h2>Henüz alanın yok.</h2>
+    <p>Hayatını alanlara böl — sağlık, kariyer, ilişkiler, hayaller. Denge çarkın dolmaya başlasın.</p>
+    <div class="state-actions"><a class="btn pri lg" href="01-onboarding.html">Hadi başlayalım</a><a class="state-link" href="03-areas.html">Şablonlara göz at</a></div>
+  </div>
+</template>
+
+<template id="tpl-error">
+  <div class="state-block">
+    <div class="state-art" id="errArt"></div>
+    <h2>Bağlantı sorunu.</h2>
+    <p>Verilerin güncellenemiyor. İnternet bağlantını kontrol et — kaydedilmemiş hiçbir şey kaybolmadı.</p>
+    <div class="state-actions"><button class="btn pri lg" onclick="this.textContent='Deneniyor…';setTimeout(()=>location.reload(),900)">Tekrar dene</button><a class="state-link" href="#">Sorunu bildir</a></div>
+  </div>
+</template>
+
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'dashboard',title:'Dashboard'});
+
+  function sector(cx,cy,r1,r2,a0,a1){
+    const p=(r,a)=>[cx+r*Math.cos(a*Math.PI/180),cy+r*Math.sin(a*Math.PI/180)];
+    const large=(a1-a0)>180?1:0;
+    const [x1,y1]=p(r2,a0),[x2,y2]=p(r2,a1),[x3,y3]=p(r1,a1),[x4,y4]=p(r1,a0);
+    return `M${x1.toFixed(1)} ${y1.toFixed(1)} A${r2} ${r2} 0 ${large} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} L${x3.toFixed(1)} ${y3.toFixed(1)} A${r1} ${r1} 0 ${large} 0 ${x4.toFixed(1)} ${y4.toFixed(1)} Z`;
+  }
+  function buildWheel(){
+    const areas=LifeData.areas;const n=areas.length;const S=360,cx=190,cy=190,ri=46,ro=150,gap=2.4;
+    let paths='',labels='';
+    areas.forEach((a,i)=>{
+      const a0=-90+i*(360/n)+gap/2, a1=-90+(i+1)*(360/n)-gap/2;
+      const h=LifeOS.healthColor(a.score);
+      const r2=ri+(ro-ri)*a.score/100;
+      paths+=`<path class="wedge track" d="${sector(cx,cy,ri,ro,a0,a1)}" fill="${h.c}" opacity=".1"/>`;
+      paths+=`<path class="wedge" data-i="${i}" d="${sector(cx,cy,ri,r2,a0,a1)}" fill="${h.c}" opacity=".92"/>`;
+      const mid=(a0+a1)/2;const lr=ro+17;
+      const lx=cx+lr*Math.cos(mid*Math.PI/180),ly=cy+lr*Math.sin(mid*Math.PI/180);
+      labels+=`<text class="wlabel" data-i="${i}" x="${lx.toFixed(0)}" y="${(ly+5).toFixed(0)}" text-anchor="middle" font-size="17">${a.icon}</text>`;
+    });
+    const avg=Math.round(areas.reduce((s,a)=>s+a.score,0)/areas.length);
+    document.getElementById('balScore').textContent=avg;
+    document.getElementById('wheelWrap').innerHTML=`<svg width="380" height="380" viewBox="0 0 380 380" style="max-width:100%">
+      ${paths}
+      <circle cx="${cx}" cy="${cy}" r="${ri-4}" fill="var(--surface)" stroke="var(--line)"/>
+      <text id="wCenterV" x="${cx}" y="${cy-2}" text-anchor="middle" font-size="30" font-weight="600" fill="var(--ink)" style="font-variant-numeric:tabular-nums">${avg}</text>
+      <text id="wCenterL" x="${cx}" y="${cy+16}" text-anchor="middle" font-size="10" fill="var(--ink-3)" font-family="var(--mono)" style="letter-spacing:.05em">DENGE</text>
+      ${labels}</svg>`;
+    // interactions
+    const cV=document.getElementById('wCenterV'),cL=document.getElementById('wCenterL');
+    function hi(i){const a=areas[i];const h=LifeOS.healthColor(a.score);cV.textContent=a.score;cV.setAttribute('fill',h.c);cL.textContent=a.name.toUpperCase();}
+    function reset(){cV.textContent=avg;cV.setAttribute('fill','var(--ink)');cL.textContent='DENGE';}
+    document.querySelectorAll('.wedge[data-i],.wlabel[data-i]').forEach(el=>{
+      const i=+el.dataset.i;
+      el.addEventListener('mouseenter',()=>hi(i));
+      el.addEventListener('mouseleave',reset);
+      el.addEventListener('click',()=>location.href='04-area-detail.html');
+    });
+    // legend
+    document.getElementById('wleg').innerHTML=areas.map(a=>{const h=LifeOS.healthColor(a.score);
+      return `<span class="li"><span class="d" style="background:${h.c}"></span>${a.name}</span>`;}).join('');
+  }
+
+  function spark(area){
+    // deterministic-ish trend ending near score
+    const base=area.score;const pts=[];let v=base+(area.neglected?34:-6);
+    for(let i=0;i<8;i++){v+= (base-v)*0.32 + (Math.sin(i*1.7+base)*5); pts.push(Math.max(8,Math.min(98,v)));}
+    pts[7]=base;
+    const h=LifeOS.healthColor(base);const w=120,ht=30;
+    const path=pts.map((p,i)=>(i?'L':'M')+(i/7*w).toFixed(1)+' '+(ht-(p/100*ht)).toFixed(1)).join(' ');
+    return `<svg width="100%" height="${ht}" viewBox="0 0 ${w} ${ht}" preserveAspectRatio="none"><defs><linearGradient id="sg${area.id}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${h.c}" stop-opacity=".2"/><stop offset="1" stop-color="${h.c}" stop-opacity="0"/></linearGradient></defs>
+      <path d="${path} L${w} ${ht} L0 ${ht} Z" fill="url(#sg${area.id})"/>
+      <path d="${path}" fill="none" stroke="${h.c}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+
+  function mountMain(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-main').content.cloneNode(true));
+    document.getElementById('focusSun').innerHTML=LifeOS.icon('pool');
+    document.getElementById('wkIc').innerHTML=LifeOS.icon('stats');
+    document.getElementById('achIc').innerHTML=LifeOS.icon('star');
+    buildWheel();
+    // focus list
+    document.getElementById('focusList').innerHTML=LifeData.pool.slice(0,3).map((t,i)=>`
+      <div class="frow"><div class="fcheck ${i===0?'done':''}" onclick="this.classList.toggle('done')">${LifeOS.icon('check')}</div>
+        <span class="ft">${t.task}</span><span class="fa">${t.icon}</span></div>`).join('');
+    // neglect strip
+    const neg=LifeData.areas.find(a=>a.neglected);
+    document.getElementById('negStrip').innerHTML=`<span class="em">${neg.icon}</span>
+      <div class="ni"><div class="t">${neg.name} ihmal ediliyor</div><div class="d">${neg.last} dokunmadın · skor ${neg.score}</div></div>
+      <a href="04-area-detail.html">İlgilen</a>`;
+    // areas grid
+    document.getElementById('areasGrid').innerHTML=LifeData.areas.slice(0,8).map(a=>`
+      <a class="acard ${a.neglected?'neg':''}" href="04-area-detail.html">
+        ${a.neglected?'<span class="neg-pulse"></span>':''}
+        <div class="ac-top"><div class="ac-ic">${a.icon}</div>${LifeOS.ring(a.score,38,5,{sub:false,fontSize:13})}</div>
+        <div class="ac-nm">${a.name}</div>
+        <div class="ac-spark">${spark(a)}</div>
+        <div class="ac-foot"><span>${a.tasks} görev</span><span class="tnum">${a.last}</span></div>
+      </a>`).join('');
+    // week
+    const mx=Math.max(...LifeData.week);const days=['Pt','Sa','Ça','Pe','Cu','Ct','Pz'];
+    document.getElementById('wkChart').innerHTML=LifeData.week.map((v,i)=>`<div class="wk-bar ${i===6?'today':''}"><div class="bar" style="height:${Math.max(8,v/mx*100)}%"></div><span class="dl">${days[i]}</span></div>`).join('');
+    // achievements
+    document.getElementById('achList').innerHTML=LifeData.achievements.map(a=>`
+      <div class="ach-row"><div class="medal ${a.unlocked?'on':'off'}">${a.unlocked?a.icon:'🔒'}</div>
+        <div class="ai"><div class="t">${a.name}</div><div class="d">${a.desc}</div></div>
+        ${!a.unlocked&&a.prog?`<div class="miniprog"><i style="width:${a.prog}%"></i></div>`:''}</div>`).join('');
+  }
+  function mountEmpty(){content.innerHTML='';content.appendChild(document.getElementById('tpl-empty').content.cloneNode(true));
+    document.getElementById('emptyArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="30" stroke="#A2E9DF" stroke-width="2" stroke-dasharray="5 6"/><circle cx="48" cy="48" r="16" fill="#E8FAF7"/><path d="M48 40v16M40 48h16" stroke="#0BA99B" stroke-width="2.4" stroke-linecap="round"/><circle cx="78" cy="26" r="5" fill="#E0A82E"/><circle cx="18" cy="66" r="4" fill="#2E9E6B"/></svg>`;}
+  function mountError(){content.innerHTML='';content.appendChild(document.getElementById('tpl-error').content.cloneNode(true));
+    document.getElementById('errArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><path d="M20 56a14 14 0 0 1 8-25 18 18 0 0 1 34 3 12 12 0 0 1 4 22z" stroke="#D2524A" stroke-width="2.2" fill="#FBE7E5"/><path d="M40 72l16-16M56 72L40 56" stroke="#D2524A" stroke-width="2.6" stroke-linecap="round"/></svg>`;}
+
+  LifeOS.stateSwitch([{id:'main',label:'Ana hal'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));({main:mountMain,empty:mountEmpty,error:mountError})[b.dataset.st]();});
+  mountMain();
+</script>
+</body>
+</html>

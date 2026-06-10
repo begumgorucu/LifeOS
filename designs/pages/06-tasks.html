@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Tasks</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  .thead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+  .thead h1{font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .thead .sub{color:var(--ink-3);font-size:14px;margin-top:3px}
+  .ttabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+  .ttabs button{background:none;border:none;font-family:inherit;font-size:14px;font-weight:500;color:var(--ink-3);
+    padding:11px 14px;border-bottom:2px solid transparent;margin-bottom:-1px;transition:.15s;white-space:nowrap;display:flex;align-items:center;gap:7px}
+  .ttabs button:hover{color:var(--ink-2)}
+  .ttabs button.on{color:var(--iris);border-color:var(--iris)}
+  .ttabs button .c{font-family:var(--mono);font-size:11px;background:var(--surface-2);padding:1px 6px;border-radius:6px;color:var(--ink-3)}
+  .ttabs button.on .c{background:var(--i50);color:var(--iris)}
+
+  /* inline add */
+  .inline-add{display:flex;align-items:center;gap:12px;border:1px dashed var(--line-2);border-radius:11px;padding:12px 14px;margin-bottom:14px;transition:.15s;cursor:text}
+  .inline-add:focus-within{border-color:var(--iris);border-style:solid;box-shadow:0 0 0 3px var(--i50)}
+  .inline-add .pl{width:21px;height:21px;border-radius:6px;border:1.6px dashed var(--line-3);display:flex;align-items:center;justify-content:center;color:var(--ink-4)}
+  .inline-add .pl svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+  .inline-add input{flex:1;border:none;outline:none;background:none;font-family:inherit;font-size:14.5px;color:var(--ink)}
+  .inline-add input::placeholder{color:var(--ink-4)}
+  .inline-add .hint{font-family:var(--mono);font-size:11px;color:var(--ink-4)}
+
+  .tgroup{margin-bottom:22px}
+  .tgroup-h{display:flex;align-items:center;gap:9px;font-size:12px;font-weight:600;color:var(--ink-3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;padding:0 2px}
+  .tgroup-h .gc{font-family:var(--mono);font-size:11px;font-weight:400;color:var(--ink-4)}
+  .tlist{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+  .trow{display:flex;align-items:center;gap:13px;padding:13px 16px;border-top:1px solid var(--line);transition:.12s;position:relative}
+  .trow:first-child{border-top:none}
+  .trow:hover{background:var(--surface-2)}
+  .tcheck{width:20px;height:20px;border-radius:6px;border:1.7px solid var(--line-3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+  .tcheck:hover{border-color:var(--iris)}
+  .tcheck.done{background:var(--iris);border-color:var(--iris)}
+  .tcheck svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0}.tcheck.done svg{opacity:1}
+  .pri-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+  .pri-high{background:var(--h-crit)}.pri-medium{background:var(--h-good)}.pri-low{background:var(--ink-4)}
+  .trow .tn{flex:1;font-size:14.5px;min-width:0}
+  .trow.done .tn{text-decoration:line-through;color:var(--ink-3)}
+  .trow .dep{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--iris);background:var(--i50);padding:2px 7px;border-radius:5px;white-space:nowrap}
+  .trow .dep svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
+  .trow .area-t{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .trow .est{font-family:var(--mono);font-size:11.5px;color:var(--ink-4);white-space:nowrap}
+  .trow .due{font-size:11.5px;color:var(--ink-3);white-space:nowrap;display:flex;align-items:center;gap:4px}
+  .trow .due.urgent{color:var(--h-crit-d)}
+  .trow .due svg{width:12px;height:12px;stroke:currentColor;stroke-width:1.8;fill:none}
+  .trow .meta{display:flex;align-items:center;gap:16px}
+  /* hover quick actions */
+  .qact{display:flex;align-items:center;gap:2px;opacity:0;transition:.15s;margin-left:4px}
+  .trow:hover .qact{opacity:1}
+  .trow:hover .meta{opacity:.35}
+  .qact button{width:28px;height:28px;border-radius:7px;border:none;background:none;color:var(--ink-3);display:flex;align-items:center;justify-content:center;transition:.12s}
+  .qact button:hover{background:var(--surface-3);color:var(--iris)}
+  .qact button.del:hover{background:var(--h-crit-s);color:var(--h-crit)}
+  .qact svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none}
+
+  .dag-hint{margin-top:8px;font-size:12px;color:var(--ink-3);display:flex;align-items:center;gap:7px;padding:0 2px}
+  .dag-hint a{color:var(--iris);text-decoration:none}
+  .dag-hint svg{width:14px;height:14px;stroke:currentColor;stroke-width:1.8;fill:none}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<template id="tpl-main">
+  <div class="thead">
+    <div><h1>Görevler</h1><div class="sub">Bugün 5 görev · bu hafta 14 · 35 tamamlandı</div></div>
+    <button class="btn pri" id="newTaskBtn"></button>
+  </div>
+  <div class="ttabs" id="ttabs">
+    <button class="on" data-t="today">Bugün <span class="c">5</span></button>
+    <button data-t="week">Bu Hafta <span class="c">14</span></button>
+    <button data-t="open">Tüm Açık <span class="c">24</span></button>
+    <button data-t="done">Tamamlandı <span class="c">35</span></button>
+    <button data-t="skip">Atlanmış <span class="c">3</span></button>
+  </div>
+  <div class="inline-add" onclick="this.querySelector('input').focus()">
+    <span class="pl" id="addPl"></span>
+    <input placeholder="Yeni görev ekle — yaz ve Enter'a bas">
+    <span class="hint">Enter ⏎</span>
+  </div>
+  <div id="taskArea"></div>
+</template>
+
+<template id="tpl-empty">
+  <div class="thead"><div><h1>Görevler</h1></div></div>
+  <div class="ttabs">
+    <button class="on">Bugün</button><button>Bu Hafta</button><button>Tüm Açık</button>
+  </div>
+  <div class="state-block">
+    <div class="state-art" id="emptyArt"></div>
+    <h2>Bugün için her şey tamam! 🎉</h2>
+    <p>Bekleyen görevin yok. Daily Pool'dan yeni öneriler al veya kendi görevini ekle. Bu da streak'i sürdürmenin bir yolu.</p>
+    <div class="state-actions"><a class="btn pri lg" href="07-daily-pool.html">Önerileri gör</a><a class="state-link" href="#">Görev ekle</a></div>
+  </div>
+</template>
+
+<template id="tpl-error">
+  <div class="thead"><div><h1>Görevler</h1></div></div>
+  <div class="state-block">
+    <div class="state-art" id="errArt"></div>
+    <h2>Görevler senkronize edilemedi.</h2>
+    <p>Değişikliklerin yerel olarak kaydedildi ama sunucuya gönderilemedi. Bağlantı gelince otomatik eşitlenecek.</p>
+    <div class="state-actions"><button class="btn pri lg" onclick="this.textContent='Eşitleniyor…';setTimeout(()=>location.reload(),900)">Şimdi eşitle</button><a class="state-link" href="#">Sorunu bildir</a></div>
+  </div>
+</template>
+
+<style id="tasks2">
+  .tbudget{display:flex;align-items:center;gap:18px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:18px;position:relative;overflow:hidden}
+  .tbudget::before{content:"";position:absolute;top:-60px;right:-30px;width:160px;height:160px;border-radius:50%;background:radial-gradient(circle,var(--i50),transparent 70%)}
+  .tb-ring{position:relative;width:54px;height:54px;flex-shrink:0;z-index:1}
+  .tb-ring .v{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:var(--iris);font-variant-numeric:tabular-nums}
+  .tb-main{flex:1;min-width:0;z-index:1}
+  .tb-lab{font-size:13px;color:var(--ink-2);margin-bottom:9px}.tb-lab b{color:var(--ink);font-weight:600}
+  .tb-bar{display:flex;gap:3px;height:14px}
+  .tb-seg{border-radius:3px;transition:.18s;cursor:default;position:relative;min-width:8px}
+  .tb-seg:hover{transform:scaleY(1.25)}
+  .tb-seg .tip{position:absolute;bottom:22px;left:50%;transform:translateX(-50%);background:var(--ink);color:#fff;font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px;white-space:nowrap;opacity:0;transition:.15s;pointer-events:none;z-index:5}
+  .tb-seg:hover .tip{opacity:1}
+  .tb-free{flex:1;border-radius:3px;background:var(--surface-2);min-width:10px}
+</style>
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'tasks',title:'Tasks',crumb:'Çalışma alanı'});
+
+  const TASKS={
+    today:[
+      {n:'30 dakika Almanca kelime tekrarı',area:'Almanca',icon:'🗣️',pri:'high',est:30,due:'Bugün',urgent:true},
+      {n:'Sabah koşusu — 5km',area:'Sağlık',icon:'🌿',pri:'medium',est:35,due:'Bugün',done:false},
+      {n:'Uygulama landing sayfasını bitir',area:'Kariyer',icon:'💼',pri:'high',est:90,due:'Bugün',urgent:true,dep:null},
+      {n:'UI tasarımı — task sayfası',area:'Kariyer',icon:'💼',pri:'medium',est:60,dep:'Wireframe'},
+      {n:'Aylık bütçeyi gözden geçir',area:'Para',icon:'💰',pri:'low',est:25,due:'Bugün'},
+    ],
+    week:[
+      {n:'B1 deneme sınavı çöz',area:'Almanca',icon:'🗣️',pri:'high',est:120,due:'Çar'},
+      {n:'Piyano — Für Elise 1. bölüm',area:'Müzik',icon:'🎵',pri:'low',est:30,due:'Per'},
+      {n:'Yatırım makalesi oku',area:'Para',icon:'💰',pri:'low',est:20,due:'Cum'},
+      {n:'App Store ekran görüntüleri',area:'Kariyer',icon:'💼',pri:'medium',est:45,due:'Cmt',dep:'UI tasarımı'},
+    ],
+    done:[
+      {n:'Wireframe → UI dönüşümü',area:'Kariyer',icon:'💼',pri:'medium',done:true},
+      {n:'Sabah meditasyonu',area:'Sağlık',icon:'🌿',pri:'low',done:true},
+      {n:'Haftalık planlama',area:'Kişisel Gelişim',icon:'🌱',pri:'medium',done:true},
+    ],
+    skip:[
+      {n:'Akşam yürüyüşü',area:'Sağlık',icon:'🌿',pri:'low',skip:true},
+    ]
+  };
+
+  function trow(t){
+    return `<div class="trow ${t.done?'done':''}">
+      <div class="tcheck ${t.done?'done':''}" onclick="this.classList.toggle('done');this.closest('.trow').classList.toggle('done')">${LifeOS.icon('check')}</div>
+      <span class="pri-dot pri-${t.pri}"></span>
+      <span class="tn">${t.n}</span>
+      ${t.dep?`<span class="dep">${LifeOS.icon('link')} ${t.dep}</span>`:''}
+      <div class="meta">
+        <span class="area-t"><span>${t.icon}</span>${t.area}</span>
+        ${t.est?`<span class="est">${t.est}dk</span>`:''}
+        ${t.due?`<span class="due ${t.urgent?'urgent':''}">${LifeOS.icon('calendar')} ${t.due}</span>`:''}
+      </div>
+      <div class="qact">
+        <button title="Düzenle" onclick="LifeOS.toast('Düzenleme açıldı')">${LifeOS.icon('edit')}</button>
+        <button title="Öncelik" onclick="LifeOS.toast('Öncelik değiştirildi')">${LifeOS.icon('bolt')}</button>
+        <button title="Kopyala" onclick="LifeOS.toast('Görev kopyalandı')">${LifeOS.icon('projects')}</button>
+        <button class="del" title="Sil" onclick="const r=this.closest('.trow');r.style.opacity=0;setTimeout(()=>r.remove(),200);LifeOS.toast('Görev silindi')">${LifeOS.icon('trash')}</button>
+      </div>
+    </div>`;
+  }
+
+  function budgetHeader(){
+    const items=TASKS.today;const total=items.reduce((s,t)=>s+(t.est||0),0);
+    const done=items.filter(t=>t.done).length;const donePct=Math.round(done/items.length*100);
+    const r=24,c=2*Math.PI*r;
+    const priCol={high:'var(--h-crit)',medium:'var(--h-good)',low:'var(--ink-4)'};
+    const hrs=(total/60).toFixed(1);
+    const segs=items.map(t=>`<div class="tb-seg" style="flex:${t.est||10};background:${priCol[t.pri]}"><span class="tip">${t.n} · ${t.est}dk</span></div>`).join('');
+    return `<div class="tbudget">
+      <div class="tb-ring"><svg width="54" height="54" viewBox="0 0 54 54"><circle cx="27" cy="27" r="${r}" fill="none" stroke="var(--surface-2)" stroke-width="5"/><circle cx="27" cy="27" r="${r}" fill="none" stroke="var(--iris)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-donePct/100)}" transform="rotate(-90 27 27)"/></svg><span class="v">${done}/${items.length}</span></div>
+      <div class="tb-main"><div class="tb-lab">Bugünün zaman bütçesi · <b>${hrs} saat</b> · ${items.length} görev</div>
+        <div class="tb-bar">${segs}<div class="tb-free"></div></div></div>
+    </div>`;
+  }
+  function renderTasks(tab){
+    const area=document.getElementById('taskArea');
+    if(tab==='today'){
+      const high=TASKS.today.filter(t=>t.pri==='high');const rest=TASKS.today.filter(t=>t.pri!=='high');
+      area.innerHTML=budgetHeader()+group('Öncelikli',high)+group('Diğer',rest)+dagHint();
+    } else if(tab==='week'){
+      area.innerHTML=group('Bu hafta',TASKS.week)+dagHint();
+    } else if(tab==='open'){
+      area.innerHTML=group('Bugün',TASKS.today)+group('Bu hafta',TASKS.week);
+    } else if(tab==='done'){
+      area.innerHTML=group('Bugün tamamlanan',TASKS.done);
+    } else {
+      area.innerHTML=group('Atlanan',TASKS.skip);
+    }
+  }
+  function group(title,items){
+    if(!items.length)return '';
+    return `<div class="tgroup"><div class="tgroup-h">${title}<span class="gc">${items.length}</span></div>
+      <div class="tlist">${items.map(trow).join('')}</div></div>`;
+  }
+  function dagHint(){return `<div class="dag-hint">${LifeOS.icon('link')} 2 görevde bağımlılık var. <a href="#">Bağımlılık grafiğini (DAG) gör →</a></div>`;}
+
+  function mountMain(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-main').content.cloneNode(true));
+    document.getElementById('newTaskBtn').innerHTML=LifeOS.icon('plus')+' Yeni görev';
+    document.getElementById('addPl').innerHTML=LifeOS.icon('plus');
+    renderTasks('today');
+    const addInp=document.querySelector('.inline-add input');
+    if(addInp)addInp.addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){LifeOS.toast('"'+e.target.value.trim()+'" eklendi');e.target.value='';}});
+    document.querySelectorAll('#ttabs button').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('#ttabs button').forEach(x=>x.classList.toggle('on',x===b));renderTasks(b.dataset.t);});
+  }
+  function mountEmpty(){content.innerHTML='';content.appendChild(document.getElementById('tpl-empty').content.cloneNode(true));
+    document.getElementById('emptyArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="30" fill="#E6F4ED"/><path d="M36 48l8 8 16-18" stroke="#2E9E6B" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+  function mountError(){content.innerHTML='';content.appendChild(document.getElementById('tpl-error').content.cloneNode(true));
+    document.getElementById('errArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="30" fill="#FBF1D9"/><path d="M48 34v18M48 60h.01" stroke="#E0A82E" stroke-width="3.2" stroke-linecap="round"/></svg>`;}
+
+  LifeOS.stateSwitch([{id:'main',label:'Ana hal'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));({main:mountMain,empty:mountEmpty,error:mountError})[b.dataset.st]();});
+  mountMain();
+</script>
+</body>
+</html>

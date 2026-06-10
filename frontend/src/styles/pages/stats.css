@@ -1,0 +1,55 @@
+  .shead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .shead h1{font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .shead .sub{color:var(--ink-3);font-size:14px;margin-top:3px}
+
+  .stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  @media(max-width:900px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
+  .scard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;position:relative;overflow:hidden}
+  .scard .ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .scard .ic svg{width:17px;height:17px;stroke-width:1.8;fill:none}
+  .scard .v{font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .scard .l{font-size:12.5px;color:var(--ink-3);margin-top:6px}
+  .scard .delta{position:absolute;top:18px;right:18px;font-size:11.5px;font-weight:500;padding:2px 7px;border-radius:6px}
+  .delta.up{background:var(--h-exc-s);color:var(--h-exc-d)}
+  .delta.down{background:var(--h-crit-s);color:var(--h-crit-d)}
+
+  .stat-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
+  @media(max-width:1000px){.stat-grid{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;margin-bottom:18px}
+  .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .panel-h h3{font-size:15px;font-weight:600;white-space:nowrap}
+  .panel-h .legend{display:flex;gap:14px;flex-wrap:wrap}
+  .panel-h .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
+  .panel-h .lg .ln{width:14px;height:3px;border-radius:2px}
+
+  /* heatmap */
+  .heat{display:flex;gap:3px;overflow-x:auto;padding-bottom:4px}
+  .heat-col{display:flex;flex-direction:column;gap:3px}
+  .heat-cell{width:13px;height:13px;border-radius:3px;background:var(--surface-2)}
+  .heat-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:8px}
+  .heat-foot{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:var(--ink-3);margin-top:12px}
+  .heat-foot .scale{display:flex;gap:3px}
+  .heat-foot .scale i{width:12px;height:12px;border-radius:3px}
+
+  /* top performers */
+  .perf{display:flex;align-items:center;gap:13px;padding:12px 0;border-top:1px solid var(--line)}
+  .perf:first-of-type{border-top:none}
+  .perf .rank{width:24px;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-4)}
+  .perf .pic{width:36px;height:36px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:17px}
+  .perf .pn{flex:1}.perf .pn .t{font-size:14px;font-weight:500}.perf .pn .d{font-size:12px;color:var(--ink-3)}
+  .perf .chg{font-size:13px;font-weight:600;color:var(--h-exc-d);display:flex;align-items:center;gap:3px}
+
+  /* achievements grid */
+  .ach-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .ach-c{border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;position:relative}
+  .ach-c.locked{opacity:.6;background:var(--surface-2)}
+  .ach-c .medal{width:48px;height:48px;border-radius:50%;margin:0 auto 11px;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .ach-c .medal.on{background:radial-gradient(circle at 35% 30%,#F6D98B,var(--gold));box-shadow:inset 0 0 0 3px rgba(255,255,255,.5)}
+  .ach-c .medal.off{background:var(--surface-3);box-shadow:inset 0 0 0 2.5px var(--line-2);font-size:19px}
+  .ach-c .an{font-size:13px;font-weight:600}.ach-c .ad{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+  .ach-c .miniprog{height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:10px}
+  .ach-c .miniprog>i{display:block;height:100%;background:var(--gold)}
+
+  .period-seg{display:inline-flex;background:var(--surface-2);border-radius:9px;padding:3px}
+  .period-seg button{background:none;border:none;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink-2);padding:6px 14px;border-radius:7px}
+  .period-seg button.on{background:var(--surface);color:var(--iris);box-shadow:0 1px 2px rgba(36,24,70,.06)}

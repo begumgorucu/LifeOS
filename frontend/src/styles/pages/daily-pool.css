@@ -1,0 +1,66 @@
+  .ritual{max-width:880px;margin:0 auto;text-align:center}
+  .intro{margin-bottom:6px}
+  .intro .kick{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--iris);margin-bottom:10px}
+  .intro h1{font-size:27px;font-weight:600;letter-spacing:-.02em}
+  .intro p{color:var(--ink-2);font-size:14.5px;margin-top:7px}
+
+  .stage{position:relative;width:820px;height:600px;margin:6px auto 0;transform-origin:top center}
+  .orbit-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+  /* Yörünge boyutu R=195 ile uyumlu: 195*2 = 390px. Çevre rengi açık teal. */
+  .orbit-ring{position:absolute;left:50%;top:290px;width:390px;height:390px;transform:translate(-50%,-50%);
+    border-radius:50%;border:1.5px dashed var(--i200);z-index:0}
+  @media(prefers-reduced-motion:no-preference){.orbit-ring{animation:spin 80s linear infinite}}
+  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+  /* center core */
+  .core{position:absolute;left:410px;top:290px;transform:translate(-50%,-50%);width:188px;height:188px;border:none;
+    background:none;cursor:pointer;z-index:5}
+  .core .ring-svg{position:absolute;inset:0}
+  .core .orb{position:absolute;inset:14px;border-radius:50%;background:linear-gradient(150deg,#0E9C90,#0BA99B 50%,#22BEB0);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;
+    box-shadow:0 12px 30px rgba(11,120,110,.42),inset 0 2px 8px rgba(255,255,255,.25);transition:.25s}
+  .core:hover .orb{transform:scale(1.04);box-shadow:0 16px 38px rgba(11,120,110,.5)}
+  @media(prefers-reduced-motion:no-preference){.core .orb::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(11,169,155,.4);animation:pulsering 2.6s ease-out infinite}}
+  @keyframes pulsering{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.35);opacity:0}}
+  .core .play{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+  .core .play svg{width:17px;height:17px;fill:#fff;margin-left:2px}
+  .core .ct{font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .core .cc{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.82);margin-top:3px}
+
+  /* satellite task cards */
+  .sat{position:absolute;width:204px;transform:translate(-50%,-50%);z-index:3;transition:transform .2s}
+  .sat .card{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:13px 14px;text-align:left;
+    box-shadow:0 6px 18px rgba(13,40,38,.09);transition:.2s;cursor:default}
+  .sat:hover{z-index:8}
+  .sat:hover .card{transform:translateY(-3px);box-shadow:0 12px 26px rgba(13,40,38,.16);border-color:var(--line-3)}
+  .sat.approved .card{border-color:var(--iris);background:linear-gradient(160deg,var(--i50),var(--surface) 70%)}
+  .sat.skipped{opacity:.45}
+  .sat .stop{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .sat .achip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--ink-2);background:var(--surface-2);padding:3px 8px;border-radius:6px}
+  .sat .mins{font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+  .sat .task{font-size:13.5px;font-weight:500;line-height:1.32;letter-spacing:-.005em}
+  .sat .reason{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;margin-top:8px;padding:2px 7px;border-radius:5px}
+  .sat .reason svg{width:10px;height:10px;stroke:currentColor;stroke-width:2.2;fill:none}
+  .reason-crit{background:var(--h-crit-s);color:var(--h-crit-d)}.reason-streak{background:var(--gold-s);color:var(--h-good-d)}
+  .reason-due{background:var(--i50);color:var(--iris)}.reason-low{background:var(--h-warn-s);color:var(--h-warn-d)}
+  .sat .sact{display:flex;gap:6px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+  .sat .sbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;font-size:12px;font-weight:500;
+    border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:7px;transition:.15s}
+  .sat .sbtn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.4;fill:none}
+  .sat .sbtn.ok:hover{border-color:var(--iris);color:var(--iris);background:var(--i50)}
+  .sat .sbtn.sk{flex:0 0 38px}
+  .sat .sbtn.sk:hover{border-color:var(--ink-3);color:var(--ink-2)}
+  .sat.approved .sbtn.ok{background:var(--iris);border-color:var(--iris);color:#fff}
+
+  /* Footer kompaktlaştırıldı (orijinalden ~30px tasarruf) — viewport'a sığsın */
+  .ritual-foot{margin-top:0}
+  .pool-summary{display:inline-flex;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface);margin-bottom:10px}
+  .ps-item{padding:8px 20px;text-align:center;border-left:1px solid var(--line)}
+  .ps-item:first-child{border-left:none}
+  .ps-item .v{font-size:17px;font-weight:600}.ps-item .v.tnum{font-variant-numeric:tabular-nums}
+  .ps-item .l{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .pool-add{display:flex;align-items:center;gap:11px;border:1px dashed var(--line-2);border-radius:12px;padding:10px 16px;max-width:440px;margin:0 auto;cursor:text;transition:.15s}
+  .pool-add:focus-within{border-color:var(--iris);border-style:solid;box-shadow:0 0 0 3px var(--i50)}
+  .pool-add svg{width:18px;height:18px;stroke:var(--ink-4);stroke-width:2;fill:none}
+  .pool-add input{flex:1;border:none;outline:none;background:none;font-family:inherit;font-size:14px}
+  .pool-add input::placeholder{color:var(--ink-4)}

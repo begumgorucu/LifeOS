@@ -1,0 +1,8 @@
+/*
+ * LifeOS — Frontend stylesheet
+ *
+ * Tek bir import: tasarım sisteminin tüm CSS değişkenleri, font'ları,
+ * komponent sınıfları (sidebar, btn, badge, card, ring, vs.) burada.
+ * Tailwind kullanmıyoruz — designs/assets/lifeos.css tek kaynak.
+ */
+@import "./styles/tokens.css";

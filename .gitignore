@@ -1,0 +1,54 @@
+# === Ortam ===
+.env
+.env.local
+.env.*.local
+*.local
+# .env.example KÖKE COMMIT EDILSIN — şablon olarak başkalarının kullanması için
+
+# === Python / Backend ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+*.egg
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+coverage.xml
+*.cover
+
+# === Node / Frontend ===
+node_modules/
+dist/
+dist-ssr/
+.vite/
+.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+*.tsbuildinfo
+
+# === OS / IDE ===
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# === Docker / Çalışma zamanı ===
+*.pid
+*.log
+docker-compose.override.yml
+
+# === Local scratch ===
+tmp/
+scratch/
+.claude/

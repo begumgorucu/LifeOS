@@ -1,0 +1,323 @@
+/* Proje detay sayfası — designs mockup'ı.
+ *
+ * 2 kolon: sol geniş ana içerik, sağ 320px Notlar paneli.
+ * Üstte breadcrumb (Projeler / proje adı), altta hero card + tasks card. */
+
+.pd-page {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  gap: 22px;
+  align-items: start;
+}
+
+/* === Breadcrumb === */
+.pd-crumb {
+  font-size: 13px; color: var(--ink-3);
+  display: flex; align-items: center; gap: 8px;
+  margin-bottom: 14px;
+}
+.pd-crumb a {
+  color: var(--ink-3); text-decoration: none; transition: .12s;
+}
+.pd-crumb a:hover { color: var(--iris); }
+.pd-crumb .here { color: var(--ink); font-weight: 500; }
+.pd-crumb .sep { color: var(--ink-4); }
+
+/* === Hero card === */
+.pd-hero {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 22px 26px;
+  display: flex; flex-direction: column; gap: 16px;
+}
+
+/* Alan chip (üst) */
+.pd-area-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  align-self: flex-start;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 4px 10px 4px 7px;
+  font-size: 12.5px;
+  color: var(--ink-2);
+  font-weight: 500;
+  cursor: pointer;
+  transition: .12s;
+  text-decoration: none;
+}
+.pd-area-chip:hover { background: var(--surface-3); border-color: var(--line-2); }
+.pd-area-chip .ic { font-size: 14px; }
+
+/* Başlık + açıklama */
+.pd-title {
+  font-size: 28px; font-weight: 600;
+  letter-spacing: -0.024em; color: var(--ink);
+  line-height: 1.15; margin: 0;
+}
+.pd-desc {
+  font-size: 15px; line-height: 1.5;
+  color: var(--ink-2);
+  max-width: 65ch;
+}
+
+/* Meta satırı */
+.pd-meta {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 18px;
+  padding-top: 4px;
+  border-top: 1px solid var(--line);
+  margin-top: 6px;
+  padding-top: 16px;
+}
+.pd-meta .item {
+  display: flex; flex-direction: column; gap: 5px;
+  min-width: 0;
+}
+.pd-meta .lbl {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-3); font-weight: 600;
+}
+.pd-meta .val {
+  font-size: 14px; color: var(--ink);
+  font-weight: 500;
+  display: inline-flex; align-items: center; gap: 6px;
+  min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pd-meta .val a {
+  color: var(--iris); text-decoration: none;
+  border-bottom: 1px dashed transparent; transition: .12s;
+}
+.pd-meta .val a:hover { border-color: var(--iris); }
+.pd-meta .val svg { width: 13px; height: 13px; stroke: var(--ink-3); stroke-width: 1.8; fill: none; flex-shrink: 0; }
+.pd-meta .val .ico-em { font-size: 14px; }
+
+/* Status badge */
+.pd-status {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px; border-radius: 7px;
+  font-size: 12.5px; font-weight: 600;
+  background: var(--i50); color: var(--iris);
+  border: 1px solid var(--i100);
+}
+.pd-status.completed { background: var(--surface-2); color: var(--ink-2); border-color: var(--line); }
+.pd-status.archived { background: var(--surface-2); color: var(--ink-3); border-color: var(--line); }
+.pd-status .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: currentColor;
+}
+
+/* Progress satırı */
+.pd-prog-row {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  font-size: 13px; color: var(--ink-3);
+  margin-top: 2px;
+}
+.pd-prog-row .label { font-weight: 500; color: var(--ink-2); }
+.pd-prog-row .count {
+  font-family: var(--mono); font-size: 12.5px;
+  color: var(--ink-2); font-weight: 500;
+}
+.pd-prog-row .count b { color: var(--iris); font-weight: 700; }
+
+.pd-prog-bar {
+  height: 8px; border-radius: 4px;
+  background: var(--surface-2); overflow: hidden;
+  position: relative;
+}
+.pd-prog-bar .fill {
+  height: 100%; border-radius: 4px;
+  background: linear-gradient(90deg, var(--i400), var(--iris));
+  transition: width .4s ease-out;
+}
+.pd-prog-bar.completed .fill { background: var(--iris); }
+
+/* === Tasks card === */
+.pd-tasks {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 20px 22px;
+  margin-top: 22px;
+}
+.pd-tasks-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+.pd-tasks-head .ttl {
+  font-size: 16px; font-weight: 600; color: var(--ink);
+  letter-spacing: -0.012em;
+  display: flex; align-items: center; gap: 8px;
+}
+.pd-tasks-head .ttl .c {
+  font-family: var(--mono); font-size: 12px;
+  color: var(--ink-3); font-weight: 500;
+}
+.pd-tasks-head .ttl .c b { color: var(--iris); font-weight: 700; }
+
+/* Task satırı (özel — TaskRow yerine kompakt versiyon) */
+.pd-tlist { display: flex; flex-direction: column; gap: 1px; }
+
+.pd-trow {
+  display: flex; align-items: center; gap: 11px;
+  padding: 10px 6px;
+  border-radius: 8px;
+  transition: .12s;
+  cursor: pointer;
+  position: relative;
+}
+.pd-trow:hover { background: var(--surface-2); }
+.pd-trow .tchk {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 1.7px solid var(--line-3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: .14s;
+}
+.pd-trow .tchk:hover { border-color: var(--iris); }
+.pd-trow.done .tchk { background: var(--iris); border-color: var(--iris); }
+.pd-trow .tchk svg {
+  width: 12px; height: 12px; stroke: #fff;
+  stroke-width: 3; fill: none; opacity: 0;
+}
+.pd-trow.done .tchk svg { opacity: 1; }
+
+.pd-trow .ttitle {
+  flex: 1; font-size: 14.5px; color: var(--ink);
+  min-width: 0; word-break: break-word;
+}
+.pd-trow.done .ttitle {
+  text-decoration: line-through;
+  text-decoration-color: var(--ink-4);
+  color: var(--ink-3);
+}
+
+.pd-trow .dep-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 11.5px; color: var(--iris);
+  background: var(--i50); padding: 3px 8px;
+  border-radius: 6px; font-weight: 500;
+  flex-shrink: 0;
+}
+.pd-trow .dep-chip svg {
+  width: 11px; height: 11px; stroke: currentColor;
+  stroke-width: 2; fill: none;
+}
+
+/* Inline add satırı */
+.pd-tadd {
+  display: flex; align-items: center; gap: 11px;
+  padding: 12px 6px;
+  margin-top: 4px;
+  cursor: text;
+  border-top: 1px dashed var(--line);
+}
+.pd-tadd:hover .icplus { border-color: var(--iris); color: var(--iris); }
+.pd-tadd:focus-within .icplus { border-color: var(--iris); color: var(--iris); }
+.pd-tadd .icplus {
+  width: 20px; height: 20px; border-radius: 6px;
+  border: 1.6px dashed var(--line-3);
+  display: flex; align-items: center; justify-content: center;
+  color: var(--ink-4); transition: .14s; flex-shrink: 0;
+}
+.pd-tadd .icplus svg { width: 11px; height: 11px; stroke: currentColor; stroke-width: 2.4; fill: none; }
+.pd-tadd input {
+  flex: 1; border: none; outline: none; background: none;
+  font-family: inherit; font-size: 14.5px;
+  color: var(--ink);
+}
+.pd-tadd input::placeholder { color: var(--ink-4); }
+.pd-tadd .hint {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--ink-4); white-space: nowrap;
+}
+
+/* Empty state — task yoksa */
+.pd-tasks-empty {
+  padding: 28px 14px;
+  text-align: center;
+  color: var(--ink-3);
+  font-size: 13.5px;
+  border-radius: 10px;
+  background: var(--surface-2);
+}
+
+/* === Sağ panel: Notlar === */
+.pd-notes {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 14px;
+  position: sticky; top: 86px;
+}
+.pd-notes .nhead {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 13px; font-weight: 600;
+  color: var(--ink); letter-spacing: -0.005em;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+.pd-notes .nhead .ic {
+  width: 16px; height: 16px;
+  border: 1.6px solid var(--ink-3);
+  border-radius: 4px;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.pd-notes .body {
+  display: flex; flex-direction: column; gap: 14px;
+  font-size: 13.5px; color: var(--ink-2);
+  line-height: 1.5;
+}
+.pd-notes h3 {
+  font-size: 13.5px; font-weight: 600; color: var(--ink);
+  margin: 4px 0 6px;
+  letter-spacing: -0.01em;
+}
+.pd-notes ul {
+  list-style: none; padding: 0; margin: 0;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.pd-notes ul li {
+  display: flex; gap: 8px; align-items: flex-start;
+  font-size: 13px; color: var(--ink-2);
+  line-height: 1.45;
+}
+.pd-notes ul li::before {
+  content: "•"; color: var(--ink-3); font-weight: 700;
+  flex-shrink: 0; line-height: 1.45;
+}
+.pd-notes p {
+  margin: 0; color: var(--ink-2); font-size: 13px;
+  line-height: 1.5;
+}
+.pd-notes code {
+  font-family: var(--mono); font-size: 11.5px;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  padding: 1px 6px; border-radius: 4px;
+  color: var(--iris);
+}
+.pd-notes a {
+  color: var(--iris); text-decoration: none;
+  border-bottom: 1px dashed var(--iris); transition: .12s;
+}
+.pd-notes a:hover { border-style: solid; }
+
+.pd-notes-empty {
+  font-size: 13px; color: var(--ink-4);
+  font-style: italic; padding: 14px 0;
+  text-align: center;
+}
+
+/* Responsive */
+@media (max-width: 1080px) {
+  .pd-page { grid-template-columns: 1fr; }
+  .pd-notes { position: static; }
+}

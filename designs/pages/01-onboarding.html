@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Onboarding</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  body{min-height:100vh;display:flex;align-items:center;justify-content:center;overflow-x:hidden}
+  .ob-bg{position:fixed;inset:0;z-index:0;overflow:hidden}
+  .ob-bg::before{content:"";position:absolute;top:-200px;left:50%;transform:translateX(-50%);
+    width:900px;height:700px;border-radius:50%;background:radial-gradient(circle,var(--i100),transparent 60%);opacity:.8}
+  .ob-bg::after{content:"";position:absolute;bottom:-260px;right:-120px;width:520px;height:520px;border-radius:50%;
+    background:radial-gradient(circle,var(--i50),transparent 65%)}
+  .stage{position:relative;z-index:1;width:100%;max-width:760px;padding:30px}
+
+  /* progress */
+  .ob-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:34px}
+  .ob-brand{display:flex;align-items:center;gap:10px}
+  .ob-brand .sb-logo{width:32px;height:32px}
+  .ob-brand b{font-size:17px;font-weight:600}.ob-brand b span{color:var(--ink-3)}
+  .steps{display:flex;align-items:center;gap:8px}
+  .steps .sd{display:flex;align-items:center;gap:8px}
+  .steps .dot{width:26px;height:5px;border-radius:3px;background:var(--line-2);transition:.3s}
+  .steps .dot.done{background:var(--iris)}.steps .dot.now{background:var(--iris)}
+  .skip{font-size:13px;color:var(--ink-3);text-decoration:none}.skip:hover{color:var(--iris)}
+
+  .panel-ob{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-xl);
+    padding:46px 48px;box-shadow:var(--shadow-pop)}
+  .step{display:none}.step.on{display:block;opacity:1;animation:slideup .4s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes slideup{from{transform:translateY(12px)}to{transform:none}}
+
+  .eyebrow-ob{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--iris);margin-bottom:16px;display:flex;align-items:center;gap:8px}
+  .step h1{font-size:34px;font-weight:600;letter-spacing:-.025em;line-height:1.1}
+  .step .lede{font-size:16px;color:var(--ink-2);margin-top:14px;line-height:1.55;max-width:540px}
+
+  /* step1 hero mark */
+  .hero-rings{display:flex;justify-content:center;gap:-10px;margin:34px 0 38px}
+  .hero-rings .ring{margin:0 -8px}
+
+  /* vision inputs */
+  .vis-list{display:flex;flex-direction:column;gap:12px;margin:30px 0 22px}
+  .vis-row{display:flex;align-items:center;gap:12px;border:1px solid var(--line-2);border-radius:11px;padding:13px 15px;transition:.15s}
+  .vis-row:focus-within{border-color:var(--iris);box-shadow:0 0 0 3px var(--i50)}
+  .vis-row .n{width:22px;height:22px;border-radius:50%;background:var(--i50);color:var(--iris);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;flex-shrink:0}
+  .vis-row input{border:none;outline:none;background:none;font-family:inherit;font-size:15px;width:100%;color:var(--ink)}
+  .vis-row input::placeholder{color:var(--ink-4)}
+  .vis-row .st{font-size:18px}
+  .sugg{display:flex;flex-wrap:wrap;gap:8px}
+  .sugg .lab{font-size:12.5px;color:var(--ink-3);width:100%;margin-bottom:2px}
+  .chip{font-size:13px;font-weight:500;color:var(--ink-2);background:var(--surface-2);border:1px solid transparent;
+    border-radius:8px;padding:7px 12px;transition:.15s;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+  .chip:hover{border-color:var(--line-3);background:var(--surface)}
+  .chip .pl{color:var(--iris);font-weight:600}
+
+  /* templates grid */
+  .tpl-bar{display:flex;align-items:center;justify-content:space-between;margin:22px 0 16px}
+  .tpl-count{font-size:13.5px;color:var(--ink-2)}.tpl-count b{color:var(--iris);font-weight:600}
+  .tpl-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;max-height:340px;overflow-y:auto;padding:2px;margin:0 -2px}
+  .tpl{border:1px solid var(--line-2);border-radius:11px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;position:relative;background:var(--surface)}
+  .tpl:hover{border-color:var(--line-3);transform:translateY(-2px)}
+  .tpl.sel{border-color:var(--iris);background:var(--i50)}
+  .tpl .em{font-size:24px;display:block;margin-bottom:8px}
+  .tpl .nm{font-size:12.5px;font-weight:500;color:var(--ink-2)}
+  .tpl.sel .nm{color:var(--iris)}
+  .tpl .ck{position:absolute;top:7px;right:7px;width:17px;height:17px;border-radius:50%;background:var(--iris);
+    color:#fff;display:none;align-items:center;justify-content:center}
+  .tpl.sel .ck{display:flex}.tpl .ck svg{width:11px;height:11px;stroke-width:3}
+  .tpl.custom{border-style:dashed;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--ink-3)}
+  .tpl.custom .em{font-size:20px}
+
+  /* completion */
+  .done-wrap{text-align:center;padding:14px 0}
+  .done-rings{display:flex;justify-content:center;margin:8px 0 30px;gap:4px;flex-wrap:wrap}
+  .done-rings .ring{margin:0 -6px;animation:pop .5s cubic-bezier(.2,.9,.3,1.2) both}
+  .conf{position:absolute;width:9px;height:9px;border-radius:2px;opacity:0}
+  @keyframes pop{from{opacity:0;transform:scale(.4)}to{opacity:1;transform:none}}
+
+  .actions{display:flex;align-items:center;justify-content:space-between;margin-top:32px}
+  .actions .left{display:flex;gap:10px}
+
+  /* error variant */
+  .ob-error{text-align:center;padding:14px 0}
+  .err-ic{width:72px;height:72px;border-radius:50%;background:var(--h-crit-s);color:var(--h-crit);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 22px}
+  .err-ic svg{width:32px;height:32px;stroke-width:1.8}
+
+  @media(max-width:680px){.tpl-grid{grid-template-columns:repeat(3,1fr)}.panel-ob{padding:32px 24px}.step h1{font-size:27px}}
+</style>
+</head>
+<body>
+<div class="ob-bg"></div>
+<div class="stage">
+  <div class="ob-top">
+    <div class="ob-brand"><div class="sb-logo">L</div><b>Life<span>OS</span></b></div>
+    <div class="steps" id="steps">
+      <div class="dot now" data-s="1"></div><div class="dot" data-s="2"></div>
+      <div class="dot" data-s="3"></div><div class="dot" data-s="4"></div>
+    </div>
+    <a class="skip" href="02-dashboard.html">Daha sonra →</a>
+  </div>
+
+  <div class="panel-ob">
+    <!-- STEP 1 -->
+    <div class="step on" data-step="1">
+      <div class="hero-rings" id="heroRings"></div>
+      <div class="eyebrow-ob">Adım 1 · Karşılama</div>
+      <h1>LifeOS'a hoş geldin, Begüm.</h1>
+      <p class="lede">Hayatını alanlara böl, her birine düzenli ilgilen. LifeOS hangi alanı ihmal ettiğini takip eder ve hayallerini yakın tutar. Kurulum 2 dakika sürüyor.</p>
+      <div class="actions">
+        <a class="skip" href="02-dashboard.html">Turu atla</a>
+        <button class="btn pri lg" onclick="goStep(2)">Hadi başlayalım →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step" data-step="2">
+      <div class="eyebrow-ob">Adım 2 · Hayaller</div>
+      <h1>Önce büyük resmi konuşalım.</h1>
+      <p class="lede">1–3 hayalini yaz. Bunlar uzun vadeli pusulan olacak; alanlarını bu hayallere bağlayacağız.</p>
+      <div class="vis-list" id="visList">
+        <div class="vis-row"><span class="n">1</span><input placeholder="Örn. Almanca'da B2 seviyesine ulaşmak" value="Almanca'da B2 seviyesine ulaşmak"><span class="st">🗣️</span></div>
+        <div class="vis-row"><span class="n">2</span><input placeholder="Örn. İlk uygulamamı yayınlamak" value="İlk uygulamamı yayınlamak"><span class="st">🚀</span></div>
+        <div class="vis-row"><span class="n">3</span><input placeholder="Örn. Avrupa'da yaşamak"><span class="st muted">＋</span></div>
+      </div>
+      <div class="sugg">
+        <span class="lab">İlham — dokun, eklensin</span>
+        <button class="chip" onclick="addVision(this,'Maraton koşmak')"><span class="pl">+</span>Maraton koşmak</button>
+        <button class="chip" onclick="addVision(this,'Kendi işimi kurmak')"><span class="pl">+</span>Kendi işimi kurmak</button>
+        <button class="chip" onclick="addVision(this,'Piyano öğrenmek')"><span class="pl">+</span>Piyano öğrenmek</button>
+        <button class="chip" onclick="addVision(this,'Finansal özgürlük')"><span class="pl">+</span>Finansal özgürlük</button>
+      </div>
+      <div class="actions">
+        <div class="left"><button class="btn gho" onclick="goStep(1)">← Geri</button></div>
+        <button class="btn pri lg" onclick="goStep(3)">Devam →</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step" data-step="3">
+      <div class="eyebrow-ob">Adım 3 · Hayat alanların</div>
+      <h1>Hangi alanlara ilgileneceksin?</h1>
+      <p class="lede">5–10 alan seç. Hazır şablonlardan başla, sonra istediğini ekler veya çıkarırsın.</p>
+      <div class="tpl-bar">
+        <div class="tpl-count"><b id="selCount">6</b> alan seçildi · <span class="muted">5–10 öneriyoruz</span></div>
+        <div class="field" style="padding:7px 11px;width:200px"><input placeholder="Kendi alanını yaz…" id="customArea" onkeydown="if(event.key==='Enter')addCustom()"></div>
+      </div>
+      <div class="tpl-grid" id="tplGrid"></div>
+      <div class="actions">
+        <div class="left"><button class="btn gho" onclick="goStep(2)">← Geri</button></div>
+        <button class="btn pri lg" onclick="goStep(4)">Alanlarımı oluştur →</button>
+      </div>
+    </div>
+
+    <!-- STEP 4 -->
+    <div class="step" data-step="4">
+      <div class="done-wrap">
+        <div class="done-rings" id="doneRings"></div>
+        <div class="eyebrow-ob" style="justify-content:center">Adım 4 · Hazırsın</div>
+        <h1>İşte hayat alanların.</h1>
+        <p class="lede" style="margin-left:auto;margin-right:auto">6 alan, 2 hayal. Her alan 70 puanla başlıyor — ilgilendikçe yükselecek. İlk görevlerini Daily Pool'da hazırladım.</p>
+        <div style="display:flex;justify-content:center;gap:12px;margin-top:30px">
+          <a class="btn sec lg" href="07-daily-pool.html">Günü planla</a>
+          <a class="btn pri lg" href="02-dashboard.html">Dashboard'a git →</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ERROR variant -->
+    <div class="step" data-step="err">
+      <div class="ob-error">
+        <div class="err-ic" id="errIc"></div>
+        <div class="eyebrow-ob" style="justify-content:center;color:var(--h-crit)">Bağlantı sorunu</div>
+        <h1>Alanların oluşturulamadı.</h1>
+        <p class="lede" style="margin-left:auto;margin-right:auto">Seçimlerin güvende — bağlantı geri geldiğinde tekrar deneyelim. Hiçbir şeyi baştan yazman gerekmeyecek.</p>
+        <div style="display:flex;justify-content:center;gap:12px;margin-top:30px">
+          <a class="skip" href="02-dashboard.html" style="align-self:center">Şimdilik atla</a>
+          <button class="btn pri lg" onclick="goStep(4)" id="retryBtn">Tekrar dene</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/lifeos.js"></script>
+<script>
+  // hero rings step 1
+  document.getElementById('heroRings').innerHTML=[78,46,88,30,62].map((s,i)=>
+    `<div style="transform:scale(${i===2?1.15:0.92});z-index:${i===2?5:1}">${LifeOS.ring(s, i===2?92:74, 7,{sub:false,fontSize:i===2?30:24})}</div>`).join('');
+
+  // templates
+  const TPL=[
+    ['Sağlık','🌿'],['Spor','🏃'],['Para','💰'],['Aile','👨‍👩‍👧'],['Sevgili','❤️'],['Arkadaşlar','👥'],
+    ['İş','💼'],['Beslenme','🥗'],['Yatırım','📈'],['Deneyim','✈️'],['Kitap','📚'],['Müzik','🎵'],
+    ['Kişisel Bakım','🧴'],['Eğlence','🎮'],['Hobi','🎨'],['İngilizce','🇬🇧'],['Almanca','🇩🇪'],['Sertifikalar','📜'],
+    ['Hayaller','⭐'],['Gelecek Planı','🗺️'],['KPSS','📝'],['PastaKodu','🍰'],['Yaşam Yeri','🏠'],['Kişisel Gelişim','🌱']
+  ];
+  const preSel=new Set([0,1,6,15,16,23]); // default selected 6
+  function renderTpl(empty){
+    const g=document.getElementById('tplGrid');
+    g.innerHTML=TPL.map((t,i)=>`<div class="tpl ${!empty&&preSel.has(i)?'sel':''}" data-i="${i}" onclick="toggleTpl(${i})">
+      <span class="ck">${LifeOS.icon('check')}</span><span class="em">${t[1]}</span><span class="nm">${t[0]}</span></div>`).join('')
+      +`<div class="tpl custom" onclick="document.getElementById('customArea').focus()"><span class="em">${LifeOS.icon('plus')}</span><span class="nm">Kendin yaz</span></div>`;
+    updateCount();
+  }
+  function toggleTpl(i){const el=document.querySelector(`.tpl[data-i="${i}"]`);el.classList.toggle('sel');updateCount();}
+  function updateCount(){const n=document.querySelectorAll('.tpl.sel').length;document.getElementById('selCount').textContent=n;}
+  function addCustom(){const v=document.getElementById('customArea').value.trim();if(!v)return;
+    const g=document.getElementById('tplGrid');const d=document.createElement('div');d.className='tpl sel';
+    d.innerHTML=`<span class="ck">${LifeOS.icon('check')}</span><span class="em">✨</span><span class="nm">${v}</span>`;
+    d.onclick=()=>{d.classList.toggle('sel');updateCount();};
+    g.insertBefore(d,g.lastElementChild);document.getElementById('customArea').value='';updateCount();}
+  function addVision(btn,txt){const rows=document.querySelectorAll('#visList .vis-row input');
+    for(const r of rows){if(!r.value){r.value=txt;btn.style.opacity=.4;btn.disabled=true;return;}}}
+
+  // step nav
+  function goStep(s){
+    document.querySelectorAll('.step').forEach(el=>el.classList.toggle('on',el.dataset.step==String(s)));
+    const map={1:0,2:1,3:2,4:3,err:3};
+    document.querySelectorAll('#steps .dot').forEach((d,i)=>{
+      d.classList.toggle('done', i< (map[s]??0));d.classList.toggle('now', i===(map[s]??0));});
+    if(s==4)fireConfetti();
+    window.scrollTo({top:0,behavior:'smooth'});
+  }
+  // completion rings
+  function buildDoneRings(){
+    document.getElementById('doneRings').innerHTML=[70,70,70,70,70,70].map((s,i)=>
+      `<div style="animation-delay:${i*0.08}s">${LifeOS.ring(s,64,6,{sub:false,fontSize:20})}</div>`).join('');
+  }
+  buildDoneRings();
+  document.getElementById('errIc').innerHTML=LifeOS.icon('wifi');
+
+  function fireConfetti(){
+    buildDoneRings();
+    const cols=['#0BA99B','#22BEB0','#E0A82E','#2E9E6B','#66D6C8'];
+    const host=document.querySelector('.done-rings');
+    for(let i=0;i<26;i++){const c=document.createElement('div');c.className='conf';
+      c.style.background=cols[i%cols.length];c.style.left=(40+Math.random()*20)+'%';c.style.top='40%';
+      host.appendChild(c);
+      const x=(Math.random()-0.5)*420,y=-120-Math.random()*160,rot=Math.random()*360;
+      c.animate([{transform:'translate(0,0) rotate(0)',opacity:1},{transform:`translate(${x}px,${y}px) rotate(${rot}deg)`,opacity:0}],
+        {duration:1100+Math.random()*500,easing:'cubic-bezier(.2,.7,.3,1)'});
+      setTimeout(()=>c.remove(),1700);}
+  }
+
+  renderTpl(false);
+
+  // review state switcher
+  LifeOS.stateSwitch([
+    {id:'flow',label:'Akış'},{id:'empty',label:'Boş girdi'},{id:'error',label:'Hata'}
+  ]);
+  // override switcher behavior for onboarding (no .state blocks; map to steps)
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>{
+    b.onclick=()=>{
+      sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+      const id=b.dataset.st;
+      if(id==='flow'){renderTpl(false);goStep(1);}
+      if(id==='empty'){ // vision step, cleared inputs + guiding suggestions
+        document.querySelectorAll('#visList .vis-row input').forEach(r=>r.value='');
+        document.querySelectorAll('.sugg .chip').forEach(c=>{c.style.opacity='';c.disabled=false;});
+        goStep(2);}
+      if(id==='error'){goStep('err');}
+    };
+  });
+</script>
+</body>
+</html>

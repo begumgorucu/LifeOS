@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Daily Pool</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  .ritual{max-width:880px;margin:0 auto;text-align:center}
+  .intro{margin-bottom:6px}
+  .intro .kick{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--iris);margin-bottom:10px}
+  .intro h1{font-size:27px;font-weight:600;letter-spacing:-.02em}
+  .intro p{color:var(--ink-2);font-size:14.5px;margin-top:7px}
+
+  .stage{position:relative;width:820px;height:600px;margin:6px auto 0;transform-origin:top center}
+  .orbit-svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+  .orbit-ring{position:absolute;left:50%;top:290px;width:456px;height:456px;transform:translate(-50%,-50%);
+    border-radius:50%;border:1.5px dashed var(--line-2);z-index:0}
+  @media(prefers-reduced-motion:no-preference){.orbit-ring{animation:spin 80s linear infinite}}
+  @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+  /* center core */
+  .core{position:absolute;left:410px;top:290px;transform:translate(-50%,-50%);width:188px;height:188px;border:none;
+    background:none;cursor:pointer;z-index:5}
+  .core .ring-svg{position:absolute;inset:0}
+  .core .orb{position:absolute;inset:14px;border-radius:50%;background:linear-gradient(150deg,#0E9C90,#0BA99B 50%,#22BEB0);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;
+    box-shadow:0 12px 30px rgba(11,120,110,.42),inset 0 2px 8px rgba(255,255,255,.25);transition:.25s}
+  .core:hover .orb{transform:scale(1.04);box-shadow:0 16px 38px rgba(11,120,110,.5)}
+  @media(prefers-reduced-motion:no-preference){.core .orb::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid rgba(11,169,155,.4);animation:pulsering 2.6s ease-out infinite}}
+  @keyframes pulsering{0%{transform:scale(1);opacity:.6}100%{transform:scale(1.35);opacity:0}}
+  .core .play{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+  .core .play svg{width:17px;height:17px;fill:#fff;margin-left:2px}
+  .core .ct{font-size:16px;font-weight:600;letter-spacing:-.01em}
+  .core .cc{font-family:var(--mono);font-size:11px;color:rgba(255,255,255,.82);margin-top:3px}
+
+  /* satellite task cards */
+  .sat{position:absolute;width:204px;transform:translate(-50%,-50%);z-index:3;transition:transform .2s}
+  .sat .card{background:var(--surface);border:1px solid var(--line-2);border-radius:14px;padding:13px 14px;text-align:left;
+    box-shadow:0 6px 18px rgba(13,40,38,.09);transition:.2s;cursor:default}
+  .sat:hover{z-index:8}
+  .sat:hover .card{transform:translateY(-3px);box-shadow:0 12px 26px rgba(13,40,38,.16);border-color:var(--line-3)}
+  .sat.approved .card{border-color:var(--iris);background:linear-gradient(160deg,var(--i50),var(--surface) 70%)}
+  .sat.skipped{opacity:.45}
+  .sat .stop{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  .sat .achip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;color:var(--ink-2);background:var(--surface-2);padding:3px 8px;border-radius:6px}
+  .sat .mins{font-family:var(--mono);font-size:10.5px;color:var(--ink-4)}
+  .sat .task{font-size:13.5px;font-weight:500;line-height:1.32;letter-spacing:-.005em}
+  .sat .reason{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;margin-top:8px;padding:2px 7px;border-radius:5px}
+  .sat .reason svg{width:10px;height:10px;stroke:currentColor;stroke-width:2.2;fill:none}
+  .reason-crit{background:var(--h-crit-s);color:var(--h-crit-d)}.reason-streak{background:var(--gold-s);color:var(--h-good-d)}
+  .reason-due{background:var(--i50);color:var(--iris)}.reason-low{background:var(--h-warn-s);color:var(--h-warn-d)}
+  .sat .sact{display:flex;gap:6px;margin-top:11px;padding-top:10px;border-top:1px solid var(--line)}
+  .sat .sbtn{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-family:inherit;font-size:12px;font-weight:500;
+    border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);border-radius:8px;padding:7px;transition:.15s}
+  .sat .sbtn svg{width:13px;height:13px;stroke:currentColor;stroke-width:2.4;fill:none}
+  .sat .sbtn.ok:hover{border-color:var(--iris);color:var(--iris);background:var(--i50)}
+  .sat .sbtn.sk{flex:0 0 38px}
+  .sat .sbtn.sk:hover{border-color:var(--ink-3);color:var(--ink-2)}
+  .sat.approved .sbtn.ok{background:var(--iris);border-color:var(--iris);color:#fff}
+
+  .ritual-foot{margin-top:8px}
+  .pool-summary{display:inline-flex;border:1px solid var(--line);border-radius:13px;overflow:hidden;background:var(--surface);margin-bottom:18px}
+  .ps-item{padding:12px 22px;text-align:center;border-left:1px solid var(--line)}
+  .ps-item:first-child{border-left:none}
+  .ps-item .v{font-size:19px;font-weight:600}.ps-item .v.tnum{font-variant-numeric:tabular-nums}
+  .ps-item .l{font-size:11px;color:var(--ink-3);margin-top:2px}
+  .pool-add{display:flex;align-items:center;gap:11px;border:1px dashed var(--line-2);border-radius:12px;padding:13px 16px;max-width:440px;margin:0 auto;cursor:text;transition:.15s}
+  .pool-add:focus-within{border-color:var(--iris);border-style:solid;box-shadow:0 0 0 3px var(--i50)}
+  .pool-add svg{width:18px;height:18px;stroke:var(--ink-4);stroke-width:2;fill:none}
+  .pool-add input{flex:1;border:none;outline:none;background:none;font-family:inherit;font-size:14px}
+  .pool-add input::placeholder{color:var(--ink-4)}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<template id="tpl-main">
+  <div class="ritual">
+    <div class="intro">
+      <div class="kick">Sabah ritüeli · Pazartesi</div>
+      <h1>Bugün için 5 görev hazırladım</h1>
+      <p>Çekirdeğin etrafındaki görevleri onayla, sonra ortadan günü başlat.</p>
+    </div>
+    <div class="stage" id="stage">
+      <div class="orbit-ring"></div>
+      <svg class="orbit-svg" id="orbitSvg" viewBox="0 0 820 600" preserveAspectRatio="none"></svg>
+      <button class="core" id="core">
+        <svg class="ring-svg" width="188" height="188" viewBox="0 0 188 188">
+          <circle cx="94" cy="94" r="84" fill="none" stroke="var(--surface-2)" stroke-width="5"/>
+          <circle id="coreProg" cx="94" cy="94" r="84" fill="none" stroke="var(--iris)" stroke-width="5" stroke-linecap="round" transform="rotate(-90 94 94)"/>
+        </svg>
+        <div class="orb"><div class="play"><svg viewBox="0 0 24 24"><path d="M7 5l12 7-12 7z"/></svg></div>
+          <div class="ct">Günü başlat</div><div class="cc" id="coreCount">3/5 hazır</div></div>
+      </button>
+    </div>
+    <div class="ritual-foot">
+      <div class="pool-summary">
+        <div class="ps-item"><div class="v tnum">3.5<span style="font-size:12px">sa</span></div><div class="l">Tahmini süre</div></div>
+        <div class="ps-item"><div class="v tnum">5</div><div class="l">Alan</div></div>
+        <div class="ps-item"><div class="v" style="color:var(--gold)">+27</div><div class="l">Olası puan</div></div>
+      </div>
+      <div class="pool-add" onclick="this.querySelector('input').focus()">
+        <span id="addIc"></span><input placeholder="Kendi görevini ekle…"><span class="mins" style="font-family:var(--mono);color:var(--ink-4)">⏎</span>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-empty">
+  <div class="ritual"><div class="state-block">
+    <div class="state-art" id="emptyArt"></div>
+    <h2>Günü çoktan başlattın 🌅</h2>
+    <p>Bugünün havuzunu onayladın. Yeni öneriler yarın sabah 07:00'de hazır olacak.</p>
+    <div class="state-actions"><a class="btn pri lg" href="06-tasks.html">Bugünkü görevler</a><a class="state-link" href="#" data-create="task">Görev ekle</a></div>
+  </div></div>
+</template>
+
+<template id="tpl-error">
+  <div class="ritual"><div class="state-block">
+    <div class="state-art" id="errArt"></div>
+    <h2>Öneriler hazırlanamadı.</h2>
+    <p>Akıllı öneri motoru şu an yanıt vermiyor. Kendi görevlerini ekleyip günü manuel başlatabilirsin.</p>
+    <div class="state-actions"><button class="btn pri lg" onclick="this.textContent='Deneniyor…';setTimeout(()=>location.reload(),900)">Tekrar dene</button><a class="state-link" href="06-tasks.html">Manuel başla</a></div>
+  </div></div>
+</template>
+
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'pool',title:'Daily Pool'});
+  const CX=410,CY=290,R=228,CORE_R=86;
+  const REASONS={high:'reason-crit',streak:'reason-streak',due:'reason-due',low:'reason-low'};
+  function reasonKind(t){if(t.reason.includes('ihmal')||t.score<30)return'high';if(/streak/i.test(t.reason))return'streak';if(/deadline|ilk gün/.test(t.reason))return'due';return'low';}
+  function reasonIcon(k){return{high:'flame',streak:'flame',due:'clock',low:'info'}[k];}
+
+  const approved=new Set([1,4]); const skipped=new Set();
+
+  function pos(i,n){const ang=(-90+i*(360/n))*Math.PI/180;return [CX+R*Math.cos(ang),CY+R*Math.sin(ang),ang];}
+  function fitStage(){const stage=document.getElementById('stage');if(!stage)return;
+    const avail=stage.parentElement.clientWidth;if(!avail)return;
+    const scale=Math.max(0.4,Math.min(1,avail/824));
+    stage.style.transform='scale('+scale+')';stage.style.marginBottom=(-600*(1-scale))+'px';}
+  window.addEventListener('resize',()=>{if(document.getElementById('stage'))fitStage();});
+  window.addEventListener('load',()=>{if(document.getElementById('stage'))fitStage();});
+
+  function renderSats(){
+    const pool=LifeData.pool.slice(0,5);
+    // satellites
+    document.querySelectorAll('.sat').forEach(e=>e.remove());
+    pool.forEach((t,i)=>{
+      const [x,y]=pos(i,pool.length);const rk=reasonKind(t);
+      const ap=approved.has(i),sk=skipped.has(i);
+      const el=document.createElement('div');
+      el.className='sat'+(ap?' approved':'')+(sk?' skipped':'');
+      el.style.left=x+'px';el.style.top=y+'px';el.dataset.i=i;
+      el.innerHTML=`<div class="card">
+        <div class="stop"><span class="achip"><span>${t.icon}</span>${t.area}</span><span class="mins">${t.mins}dk</span></div>
+        <div class="task">${t.task}</div>
+        <div class="reason ${REASONS[rk]}">${LifeOS.icon(reasonIcon(rk))} ${t.reason}</div>
+        <div class="sact">
+          <button class="sbtn ok" onclick="toggleApprove(${i})">${LifeOS.icon('check')} ${ap?'Onaylandı':'Onayla'}</button>
+          <button class="sbtn sk" title="Yarına ertele" onclick="skip(${i})">${LifeOS.icon('skip')}</button>
+        </div></div>`;
+      document.getElementById('stage').appendChild(el);
+    });
+    drawConnectors(pool.length);
+    updateCore();
+  }
+  function drawConnectors(n){
+    const svg=document.getElementById('orbitSvg');let s='';
+    for(let i=0;i<n;i++){const [x,y,ang]=pos(i,n);
+      const x1=CX+CORE_R*Math.cos(ang),y1=CY+CORE_R*Math.sin(ang);
+      const x2=CX+(R-58)*Math.cos(ang),y2=CY+(R-58)*Math.sin(ang);
+      const ap=approved.has(i),sk=skipped.has(i);
+      const col=ap?'var(--iris)':(sk?'var(--line-2)':'var(--line-3)');
+      const dash=ap?'':'stroke-dasharray="2 6"';
+      s+=`<line x1="${x1.toFixed(0)}" y1="${y1.toFixed(0)}" x2="${x2.toFixed(0)}" y2="${y2.toFixed(0)}" stroke="${col}" stroke-width="${ap?2.5:1.5}" stroke-linecap="round" ${dash}/>`;
+      if(ap)s+=`<circle cx="${x2.toFixed(0)}" cy="${y2.toFixed(0)}" r="3.5" fill="var(--iris)"/>`;
+    }
+    svg.innerHTML=s;
+  }
+  function updateCore(){
+    const n=approved.size;const C=2*Math.PI*84;
+    document.getElementById('coreProg').style.strokeDasharray=C;
+    document.getElementById('coreProg').style.strokeDashoffset=C*(1-n/5);
+    document.getElementById('coreCount').textContent=n>0?`${n}/5 hazır`:'Görev seç';
+  }
+  window.toggleApprove=i=>{skipped.delete(i);approved.has(i)?approved.delete(i):approved.add(i);renderSats();};
+  window.skip=i=>{approved.delete(i);skipped.has(i)?skipped.delete(i):skipped.add(i);renderSats();};
+
+  function mountMain(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-main').content.cloneNode(true));
+    document.getElementById('addIc').innerHTML=LifeOS.icon('plus');
+    renderSats();requestAnimationFrame(fitStage);setTimeout(fitStage,60);
+    if(window.ResizeObserver){const ro=new ResizeObserver(()=>fitStage());ro.observe(document.querySelector('.ritual'));}
+    document.getElementById('core').onclick=()=>{
+      const n=approved.size;if(n===0){LifeOS.toast('Önce en az bir görev onayla');return;}
+      LifeOS.toast('Günün başladı 🌅 — '+n+' görev panelinde');
+      setTimeout(()=>location.href='02-dashboard.html',1100);
+    };
+    document.querySelector('.pool-add input').addEventListener('keydown',e=>{if(e.key==='Enter'&&e.target.value.trim()){LifeOS.toast('"'+e.target.value.trim()+'" eklendi');e.target.value='';}});
+  }
+  function mountEmpty(){content.innerHTML='';content.appendChild(document.getElementById('tpl-empty').content.cloneNode(true));
+    document.getElementById('emptyArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="56" r="16" fill="#E0A82E"/><path d="M48 30v-7M30 38l-5-5M66 38l5-5M22 56h-7M81 56h-7" stroke="#E0A82E" stroke-width="2.6" stroke-linecap="round"/></svg>`;}
+  function mountError(){content.innerHTML='';content.appendChild(document.getElementById('tpl-error').content.cloneNode(true));
+    document.getElementById('errArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="30" fill="#FBF1D9"/><path d="M48 34v18M48 60h.01" stroke="#E0A82E" stroke-width="3.2" stroke-linecap="round"/></svg>`;}
+
+  LifeOS.stateSwitch([{id:'main',label:'Ana hal'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));({main:mountMain,empty:mountEmpty,error:mountError})[b.dataset.st]();});
+  mountMain();
+</script>
+</body>
+</html>

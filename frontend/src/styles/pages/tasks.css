@@ -1,0 +1,249 @@
+/* === Eski global task row stilleri — Dashboard ve diğer sayfalarda da kullanılıyor === */
+.thead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px;flex-wrap:wrap}
+.thead h1{font-size:26px;font-weight:600;letter-spacing:-.02em}
+.thead .sub{color:var(--ink-3);font-size:14px;margin-top:3px}
+
+/* inline add */
+.inline-add{display:flex;align-items:center;gap:12px;border:1px dashed var(--line-2);border-radius:11px;padding:12px 14px;margin-bottom:14px;transition:.15s;cursor:text}
+.inline-add:focus-within{border-color:var(--iris);border-style:solid;box-shadow:0 0 0 3px var(--i50)}
+.inline-add .pl{width:21px;height:21px;border-radius:6px;border:1.6px dashed var(--line-3);display:flex;align-items:center;justify-content:center;color:var(--ink-4)}
+.inline-add .pl svg{width:13px;height:13px;stroke:currentColor;stroke-width:2;fill:none}
+.inline-add input{flex:1;border:none;outline:none;background:none;font-family:inherit;font-size:14.5px;color:var(--ink)}
+.inline-add input::placeholder{color:var(--ink-4)}
+.inline-add .hint{font-family:var(--mono);font-size:11px;color:var(--ink-4)}
+
+/* Task row stilleri (TaskRow component) */
+.tlist{background:var(--surface);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.trow{display:flex;align-items:center;gap:13px;padding:13px 16px;border-top:1px solid var(--line);transition:.12s;position:relative}
+.trow:first-child{border-top:none}
+.trow:hover{background:var(--surface-2)}
+.tcheck{width:20px;height:20px;border-radius:6px;border:1.7px solid var(--line-3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.15s}
+.tcheck:hover{border-color:var(--iris)}
+.tcheck.done{background:var(--iris);border-color:var(--iris)}
+.tcheck svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0}.tcheck.done svg{opacity:1}
+.pri-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.pri-high{background:var(--h-crit)}.pri-medium{background:var(--h-good)}.pri-low{background:var(--ink-4)}
+.trow .tn{flex:1;font-size:14.5px;min-width:0}
+.trow.done .tn{text-decoration:line-through;color:var(--ink-3)}
+.trow .dep{display:inline-flex;align-items:center;gap:4px;font-size:11px;color:var(--iris);background:var(--i50);padding:2px 7px;border-radius:5px;white-space:nowrap}
+.trow .dep svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
+.trow .area-t{font-size:11.5px;color:var(--ink-3);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.trow .area-t:hover{color:var(--iris)}
+.trow .proj-chip:hover{background:var(--i100)}
+.trow .est{font-family:var(--mono);font-size:11.5px;color:var(--ink-4);white-space:nowrap}
+.trow .due{font-size:11.5px;color:var(--ink-3);white-space:nowrap;display:flex;align-items:center;gap:4px}
+.trow .due.urgent{color:var(--h-crit-d)}
+.trow .due svg{width:12px;height:12px;stroke:currentColor;stroke-width:1.8;fill:none}
+.trow .meta{display:flex;align-items:center;gap:12px}
+.qact{display:flex;align-items:center;gap:2px;opacity:0;transition:.15s;margin-left:4px}
+.trow:hover .qact{opacity:1}
+.trow:hover .meta{opacity:.45}
+.qact button{width:28px;height:28px;border-radius:7px;border:none;background:none;color:var(--ink-3);display:flex;align-items:center;justify-content:center;transition:.12s}
+.qact button:hover{background:var(--surface-3);color:var(--iris)}
+.qact button.del:hover{background:var(--h-crit-s);color:var(--h-crit)}
+.qact svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none}
+
+/* === Split layout (Tasks sayfası) ====================================== */
+.tk-page {
+  display: grid;
+  grid-template-columns: 248px minmax(0, 1fr);
+  gap: 22px;
+  min-height: calc(100vh - 80px);
+}
+
+/* === Sol panel === */
+.tk-side {
+  display: flex; flex-direction: column;
+  gap: 18px;
+  padding: 4px 0 60px;
+  border-right: 1px solid var(--line);
+  padding-right: 18px;
+}
+.tk-side-sec {
+  display: flex; flex-direction: column; gap: 2px;
+}
+.tk-side-sec .lbl {
+  font-family: var(--mono); font-size: 10px;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--ink-4); font-weight: 600;
+  padding: 0 8px 6px;
+}
+.tk-side-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: .12s;
+  color: var(--ink-2);
+  font-size: 13.5px;
+  font-weight: 500;
+  border: none; background: none;
+  font-family: inherit;
+  text-align: left;
+  min-width: 0;
+}
+.tk-side-item:hover { background: var(--surface-2); color: var(--ink); }
+.tk-side-item.on {
+  background: var(--i50); color: var(--iris); font-weight: 600;
+}
+.tk-side-item .ic {
+  width: 18px; height: 18px;
+  display: inline-flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  color: inherit;
+}
+.tk-side-item .ic svg { width: 14px; height: 14px; stroke: currentColor; stroke-width: 1.9; fill: none; }
+.tk-side-item .emoji {
+  width: 18px; height: 18px; display: inline-flex; align-items: center; justify-content: center;
+  font-size: 13px; flex-shrink: 0;
+}
+.tk-side-item .label {
+  flex: 1; min-width: 0;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.tk-side-item .c {
+  font-family: var(--mono); font-size: 11px;
+  color: var(--ink-4); font-weight: 500;
+  flex-shrink: 0;
+}
+.tk-side-item.on .c { color: var(--iris); }
+.tk-side-item .health {
+  width: 28px; height: 4px; border-radius: 2px;
+  background: var(--surface-2); overflow: hidden; flex-shrink: 0;
+}
+.tk-side-item .health .fill { height: 100%; border-radius: 2px; }
+
+.tk-side-empty {
+  font-size: 12px; color: var(--ink-4);
+  padding: 4px 10px; font-style: italic;
+}
+
+/* === Sağ panel === */
+.tk-main {
+  display: flex; flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding-bottom: 60px;
+}
+
+.tk-main-head {
+  display: flex; align-items: flex-end; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap;
+}
+.tk-main-head .left {
+  display: flex; flex-direction: column; gap: 3px; min-width: 0;
+}
+.tk-main-head h1 {
+  font-size: 26px; font-weight: 600; letter-spacing: -0.02em;
+  color: var(--ink); line-height: 1.15;
+  display: flex; align-items: center; gap: 10px;
+}
+.tk-main-head h1 .em {
+  font-size: 22px;
+}
+.tk-main-head .sub {
+  font-size: 13px; color: var(--ink-3);
+  display: flex; align-items: center; gap: 8px;
+}
+.tk-main-head .sub b { color: var(--iris); font-weight: 600; }
+.tk-main-head .sub .sep { color: var(--ink-4); }
+
+.tk-main-head .add {
+  background: var(--iris); color: #fff; border: none;
+  border-radius: 10px; padding: 8px 14px;
+  font-family: inherit; font-size: 13px; font-weight: 500;
+  cursor: pointer; transition: .15s;
+  display: inline-flex; align-items: center; gap: 6px;
+}
+.tk-main-head .add:hover { background: var(--i600); transform: translateY(-1px); }
+.tk-main-head .add svg { width: 13px; height: 13px; stroke: currentColor; stroke-width: 2.4; fill: none; }
+
+/* Proje meta paneli (sağ panel başlığının altında) */
+.tk-proj-meta {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 14px 16px;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.tk-proj-meta .row1 {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap;
+}
+.tk-proj-meta .desc {
+  font-size: 13.5px; color: var(--ink-2); line-height: 1.45;
+  margin-top: -2px;
+}
+.tk-proj-meta .pinfo {
+  display: flex; align-items: center; gap: 14px;
+  font-family: var(--mono); font-size: 11.5px;
+  color: var(--ink-3);
+}
+.tk-proj-meta .pinfo .item {
+  display: inline-flex; align-items: center; gap: 5px;
+}
+.tk-proj-meta .pinfo .item.urgent { color: var(--h-crit-d); }
+.tk-proj-meta .pinfo b { color: var(--ink); font-weight: 600; }
+
+.tk-proj-bar {
+  height: 6px; border-radius: 3px;
+  background: var(--surface-2); overflow: hidden;
+  position: relative;
+}
+.tk-proj-bar .fill {
+  height: 100%; border-radius: 3px;
+  background: linear-gradient(90deg, var(--i400), var(--iris));
+  transition: width .35s;
+}
+
+/* Görev grupları (Açık / Tamamlanan ayrımı için) */
+.tk-group { margin-top: 8px; }
+.tk-group-h {
+  display: flex; align-items: center; gap: 9px;
+  font-size: 11.5px; font-weight: 600;
+  color: var(--ink-3); text-transform: uppercase; letter-spacing: .04em;
+  margin-bottom: 8px; padding: 0 2px;
+}
+.tk-group-h .gc {
+  font-family: var(--mono); font-size: 11px; font-weight: 400;
+  color: var(--ink-4);
+}
+
+/* Empty state */
+.tk-empty {
+  background: var(--surface);
+  border: 1px dashed var(--line-2);
+  border-radius: 12px;
+  padding: 36px 20px;
+  text-align: center;
+  color: var(--ink-3);
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+}
+.tk-empty .ic {
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--i50); color: var(--iris);
+  display: flex; align-items: center; justify-content: center;
+}
+.tk-empty .ic svg { width: 20px; height: 20px; stroke: currentColor; stroke-width: 1.8; fill: none; }
+.tk-empty h3 { font-size: 15px; font-weight: 600; color: var(--ink); margin: 0; }
+.tk-empty p { font-size: 13px; margin: 0; }
+
+/* Skeleton */
+.tk-skel {
+  height: 48px; margin: 6px 0; border-radius: 9px;
+  background: var(--surface-2);
+  animation: tk-pulse 1.4s ease-in-out infinite;
+}
+@keyframes tk-pulse {
+  0%, 100% { opacity: .55; }
+  50% { opacity: .85; }
+}
+
+/* Responsive */
+@media (max-width: 980px) {
+  .tk-page { grid-template-columns: 1fr; gap: 14px; }
+  .tk-side {
+    border-right: none; border-bottom: 1px solid var(--line);
+    padding-right: 0; padding-bottom: 14px;
+  }
+}

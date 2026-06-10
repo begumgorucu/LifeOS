@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Projects</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  .phead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;flex-wrap:wrap}
+  .phead h1{font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .phead .sub{color:var(--ink-3);font-size:14px;margin-top:3px}
+  .ptoolbar{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap}
+  .chipfilter{display:flex;align-items:center;gap:7px;border:1px solid var(--line-2);border-radius:9px;padding:8px 12px;font-size:13px;color:var(--ink-2);background:var(--surface);cursor:pointer;white-space:nowrap}
+  .chipfilter svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+
+  /* kanban */
+  .kanban{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;align-items:start}
+  @media(max-width:900px){.kanban{grid-template-columns:1fr}}
+  .kcol{background:var(--surface-2);border-radius:var(--r-lg);padding:12px}
+  .kcol-head{display:flex;align-items:center;justify-content:space-between;padding:4px 8px 12px}
+  .kcol-head .t{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600}
+  .kcol-head .t .dot{width:8px;height:8px;border-radius:50%}
+  .kcol-head .cnt{font-family:var(--mono);font-size:12px;color:var(--ink-3)}
+  .kcol-head .add{width:24px;height:24px;border-radius:7px;border:none;background:none;color:var(--ink-3);display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .kcol-head .add:hover{background:var(--surface);color:var(--iris)}
+  .kcol-head .add svg{width:15px;height:15px;stroke:currentColor;stroke-width:2.2;fill:none}
+  .kcards{display:flex;flex-direction:column;gap:10px}
+  .pcard{background:var(--surface);border:1px solid var(--line);border-radius:11px;padding:14px;cursor:pointer;transition:.15s}
+  .pcard:hover{transform:translateY(-2px);border-color:var(--iris);box-shadow:0 4px 14px rgba(36,24,70,.06)}
+  .pcard .ptag{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+  .pcard .pn{font-size:14px;font-weight:600;letter-spacing:-.01em;line-height:1.3;margin-bottom:11px}
+  .pcard .pbar{height:6px;border-radius:3px;background:var(--surface-2);overflow:hidden}
+  .pcard .pbar>i{display:block;height:100%;border-radius:3px;background:var(--iris)}
+  .pcard.completed .pbar>i{background:var(--h-exc)}
+  .pcard .pfoot{display:flex;align-items:center;justify-content:space-between;margin-top:11px;font-size:11.5px;color:var(--ink-3)}
+  .pcard .pfoot .dl{display:flex;align-items:center;gap:5px}
+  .pcard .pfoot .dl svg{width:12px;height:12px;stroke:currentColor;stroke-width:1.8;fill:none}
+  .pcard .pprog{font-family:var(--mono);color:var(--ink-2)}
+
+  /* detail */
+  .pd-grid{display:grid;grid-template-columns:1fr 320px;gap:22px;align-items:start}
+  @media(max-width:1040px){.pd-grid{grid-template-columns:1fr}}
+  .pd-head{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:24px;margin-bottom:20px}
+  .pd-head h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:12px 0 8px}
+  .pd-head .pd-desc{font-size:14.5px;color:var(--ink-2);line-height:1.55;max-width:560px}
+  .pd-meta{display:flex;gap:22px;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .pd-meta .m .l{font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px}
+  .pd-meta .m .v{font-size:14px;font-weight:500;display:flex;align-items:center;gap:7px}
+  .pd-prog{margin-top:18px}
+  .pd-prog .bar{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+  .pd-prog .bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--i400),var(--iris));border-radius:4px}
+  .pd-prog .lab{display:flex;justify-content:space-between;font-size:13px;color:var(--ink-2);margin-bottom:8px}
+
+  .pd-tasks{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:8px}
+  .pd-tasks .th{padding:14px 14px 8px;font-size:14px;font-weight:600}
+  .tline{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:9px;transition:.15s}
+  .tline:hover{background:var(--surface-2)}
+  .tcheck{width:19px;height:19px;border-radius:6px;border:1.6px solid var(--line-3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .tcheck.done{background:var(--iris);border-color:var(--iris)}.tcheck svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0}.tcheck.done svg{opacity:1}
+  .tline .tn{flex:1;font-size:14px}.tcheck.done ~ .tn{text-decoration:line-through;color:var(--ink-3)}
+  .tline .dep{display:flex;align-items:center;gap:4px;font-size:11px;color:var(--ink-3)}
+  .tline .dep svg{width:12px;height:12px;stroke:currentColor;stroke-width:1.8;fill:none}
+  .addtask{padding:11px 14px;color:var(--ink-4);font-size:13px;display:flex;align-items:center;gap:8px}
+  .addtask svg{width:15px;height:15px;stroke:currentColor;stroke-width:2;fill:none}
+
+  .notes{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px}
+  .notes h3{font-size:13px;font-weight:600;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+  .notes h3 svg{width:15px;height:15px;stroke:var(--ink-3);stroke-width:1.8;fill:none}
+  .notes .md{font-size:13.5px;color:var(--ink-2);line-height:1.6}
+  .notes .md h4{font-size:13px;font-weight:600;color:var(--ink);margin:12px 0 6px}
+  .notes .md ul{margin:6px 0 6px 18px}.notes .md li{margin:3px 0}
+  .notes .md code{font-family:var(--mono);font-size:12px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<!-- LIST -->
+<template id="tpl-main">
+  <div class="phead">
+    <div><h1>Projeler</h1><div class="sub">5 aktif · 1 tamamlandı · 1 arşiv</div></div>
+    <button class="btn pri" id="newProjBtn"></button>
+  </div>
+  <div class="ptoolbar">
+    <div class="chipfilter" id="fArea"></div>
+    <div class="chipfilter" id="fStatus"></div>
+    <div class="chipfilter" id="fDate"></div>
+    <div class="spacer"></div>
+    <div class="seg"><button class="on">Kanban</button><button>Liste</button></div>
+  </div>
+  <div class="kanban" id="kanban"></div>
+</template>
+
+<!-- DETAIL -->
+<template id="tpl-detail">
+  <div class="crumbnav" style="display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-3);margin-bottom:18px">
+    <a href="#" onclick="go('main');return false" style="color:var(--ink-3);text-decoration:none">Projeler</a>
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>
+    <span style="color:var(--ink-2)">LifeOS v1 yayını</span>
+  </div>
+  <div class="pd-grid">
+    <div>
+      <div class="pd-head">
+        <span class="tag"><span style="font-size:14px">💼</span>Kariyer</span>
+        <h1>LifeOS v1 yayını</h1>
+        <div class="pd-desc">İlk sürümü App Store ve web'de yayınla. Onboarding, dashboard ve 3 çekirdek sayfa hazır olmalı; analytics bağlı, landing yayında.</div>
+        <div class="pd-meta">
+          <div class="m"><div class="l">Durum</div><div class="v"><span class="badge b-iris">Aktif</span></div></div>
+          <div class="m"><div class="l">Son tarih</div><div class="v" id="dlMeta"></div></div>
+          <div class="m"><div class="l">Alan</div><div class="v">Kariyer</div></div>
+          <div class="m"><div class="l">Hayal</div><div class="v" style="color:var(--iris)">İlk uygulamamı yayınla</div></div>
+        </div>
+        <div class="pd-prog">
+          <div class="lab"><span>İlerleme</span><span class="tnum"><b style="color:var(--iris)">7</b>/12 görev</span></div>
+          <div class="bar"><i style="width:58%"></i></div>
+        </div>
+      </div>
+      <div class="pd-tasks" id="pdTasks"></div>
+    </div>
+    <div>
+      <div class="notes">
+        <h3 id="notesIc">Notlar</h3>
+        <div class="md">
+          <h4>Yayın kontrol listesi</h4>
+          <ul><li>App Store metadata + ekran görüntüleri</li><li>Landing: <code>lifeos.app</code></li><li>Analytics: Plausible</li></ul>
+          <h4>Açık sorular</h4>
+          <ul><li>Fiyatlandırma: freemium mi?</li><li>Beta listesine duyuru</li></ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-empty">
+  <div class="phead"><div><h1>Projeler</h1></div></div>
+  <div class="state-block">
+    <div class="state-art" id="emptyArt"></div>
+    <h2>Henüz projen yok.</h2>
+    <p>Projeler, bir alana ait bitirilebilir iş paketleridir. "Sabah koşusu rutini" veya "B2 sınavına hazırlık" gibi — büyük hedefini küçük adımlara böl.</p>
+    <div class="state-actions"><button class="btn pri lg" id="addBtn">İlk projeyi oluştur</button><a class="state-link" href="03-areas.html">Önce bir alan seç</a></div>
+  </div>
+</template>
+
+<template id="tpl-error">
+  <div class="phead"><div><h1>Projeler</h1></div></div>
+  <div class="state-block">
+    <div class="state-art" id="errArt"></div>
+    <h2>Projeler yüklenemedi.</h2>
+    <p>Bağlantı sorunu nedeniyle projelerine ulaşamıyoruz. Lütfen tekrar dene.</p>
+    <div class="state-actions"><button class="btn pri lg" onclick="this.textContent='Deneniyor…';setTimeout(()=>location.reload(),900)">Tekrar dene</button><a class="state-link" href="#">Sorunu bildir</a></div>
+  </div>
+</template>
+
+<style id="proj2">
+  .momentum{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:16px 20px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;position:relative;overflow:hidden}
+  .momentum::before{content:"";position:absolute;top:-60px;right:-30px;width:170px;height:170px;border-radius:50%;background:radial-gradient(circle,var(--i50),transparent 70%)}
+  .mom-stat{position:relative;z-index:1}
+  .mom-stat .v{font-size:24px;font-weight:600;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+  .mom-stat .l{font-size:11.5px;color:var(--ink-3);margin-top:2px}
+  .mom-track{flex:1;min-width:220px;position:relative;z-index:1}
+  .mom-list{flex:1;min-width:260px;display:flex;flex-direction:column;gap:8px;position:relative;z-index:1}
+  .mrow{display:flex;align-items:center;gap:10px;font-size:12.5px}
+  .mrow .mi{font-size:14px;width:20px;text-align:center;flex-shrink:0}
+  .mrow .mn{width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink-2);font-weight:500;flex-shrink:0}
+  .mrow .mbar{flex:1;height:7px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+  .mrow .mbar>i{display:block;height:100%;border-radius:4px}
+  .mrow .mp{width:36px;text-align:right;color:var(--ink-3);font-size:11.5px;font-variant-numeric:tabular-nums;flex-shrink:0}
+  .mom-track .lab{display:flex;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-bottom:8px}
+  .mom-track .lab b{color:var(--iris);font-weight:600}
+  .mom-bars{display:flex;gap:4px;height:12px}
+  .mom-bars .seg{flex:1;border-radius:3px;background:var(--surface-2);overflow:hidden;position:relative}
+  .mom-bars .seg>i{position:absolute;inset:0;border-radius:3px}
+  .pcard{position:relative;overflow:hidden}
+  .pcard::before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ac,var(--iris))}
+  .qhead{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:11px}
+  .pring{position:relative;width:38px;height:38px;flex-shrink:0}
+  .pring .pv{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:600;font-variant-numeric:tabular-nums}
+  .pdl{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;padding:3px 8px;border-radius:6px}
+  .pdl svg{width:11px;height:11px;stroke:currentColor;stroke-width:2;fill:none}
+  .pdl.soon{background:var(--h-crit-s);color:var(--h-crit-d)}.pdl.mid{background:var(--h-good-s);color:var(--h-good-d)}.pdl.far{background:var(--surface-2);color:var(--ink-3)}
+  .pseal{position:absolute;top:11px;right:11px;width:26px;height:26px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#F6D98B,var(--gold));display:flex;align-items:center;justify-content:center;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5)}
+  .pseal svg{width:14px;height:14px;stroke:#fff;stroke-width:3;fill:none}
+</style>
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'projects',title:'Projects',crumb:'Çalışma alanı'});
+  const COLS=[{k:'active',t:'Aktif',c:'#0BA99B'},{k:'completed',t:'Tamamlandı',c:'#2E9E6B'},{k:'archived',t:'Arşiv',c:'#938EA6'}];
+  const MONTHS={Oca:0,'Şub':1,Mar:2,Nis:3,May:4,Haz:5,Tem:6,'Ağu':7,Eyl:8,Eki:9,Kas:10,Ara:11};
+  function daysLeft(dl){if(!dl)return null;const m=dl.split(' ');const d=new Date(2026,MONTHS[m[1]]??5,+m[0]);const today=new Date(2026,5,2);return Math.round((d-today)/86400000);}
+  function areaColor(name){const a=(LifeData.areas||[]).find(x=>x.name===name);return a?LifeOS.healthColor(a.score).c:'#0BA99B';}
+  function miniRing(pct,color){const r=16,c=2*Math.PI*r;return `<div class="pring"><svg width="38" height="38" viewBox="0 0 38 38"><circle cx="19" cy="19" r="${r}" fill="none" stroke="${color}22" stroke-width="4"/><circle cx="19" cy="19" r="${r}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct/100)}" transform="rotate(-90 19 19)"/></svg><span class="pv" style="color:${color}">${pct}</span></div>`;}
+
+  function pcard(p){
+    const pct=Math.round(p.done/p.total*100);
+    const ac=areaColor(p.area);
+    const completed=p.status==='completed';
+    const dl=daysLeft(p.deadline);
+    let dlChip='';
+    if(p.deadline&&!completed){const cls=dl<7?'soon':(dl<=14?'mid':'far');dlChip=`<span class="pdl ${cls}">${LifeOS.icon('clock')} ${dl} gün</span>`;}
+    return `<div class="pcard ${p.status}" style="--ac:${ac}" onclick="go('detail')">
+      ${completed?`<span class="pseal">${LifeOS.icon('check')}</span>`:''}
+      <div class="qhead">
+        <span class="tag"><span style="font-size:13px">${p.icon}</span>${p.area}</span>
+        ${miniRing(pct,completed?'#2E9E6B':ac)}
+      </div>
+      <div class="pn">${p.name}</div>
+      <div class="pfoot" style="margin-top:12px">
+        <span class="pprog tnum">${p.done}/${p.total} görev</span>
+        ${dlChip||`<span style="font-size:11.5px;color:var(--ink-3)">${completed?'Tamamlandı 🎉':pct+'%'}</span>`}
+      </div>
+    </div>`;
+  }
+  function mountMain(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-main').content.cloneNode(true));
+    document.getElementById('newProjBtn').innerHTML=LifeOS.icon('plus')+' Yeni proje';
+    document.getElementById('fArea').innerHTML=LifeOS.icon('areas')+' Alan: Tümü '+LifeOS.icon('chevrond');
+    document.getElementById('fStatus').innerHTML=LifeOS.icon('filter')+' Durum: Tümü '+LifeOS.icon('chevrond');
+    document.getElementById('fDate').innerHTML=LifeOS.icon('calendar')+' Tarih '+LifeOS.icon('chevrond');
+    // momentum hero
+    const active=LifeData.projects.filter(p=>p.status==='active');
+    const totalDone=LifeData.projects.reduce((s,p)=>s+p.done,0),totalAll=LifeData.projects.reduce((s,p)=>s+p.total,0);
+    const overall=Math.round(totalDone/totalAll*100);
+    const mom=document.createElement('div');mom.className='momentum';
+    mom.innerHTML=`<div class="mom-stat"><div class="v" style="color:var(--iris)">${active.length}</div><div class="l">Aktif proje</div></div>
+      <div class="mom-stat"><div class="v">%${overall}</div><div class="l">Genel momentum</div></div>
+      <div class="mom-list">${active.map(p=>{const pc=Math.round(p.done/p.total*100);const col=areaColor(p.area);
+        return `<div class="mrow"><span class="mi">${p.icon}</span><span class="mn">${p.name}</span><div class="mbar"><i style="width:${pc}%;background:${col}"></i></div><span class="mp">${pc}%</span></div>`;}).join('')}</div>`;
+    document.getElementById('kanban').before(mom);
+    document.getElementById('kanban').innerHTML=COLS.map(col=>{
+      const items=LifeData.projects.filter(p=>p.status===col.k);
+      return `<div class="kcol"><div class="kcol-head"><div class="t"><span class="dot" style="background:${col.c}"></span>${col.t}<span class="cnt">${items.length}</span></div><button class="add">${LifeOS.icon('plus')}</button></div>
+        <div class="kcards">${items.map(pcard).join('')}</div></div>`;
+    }).join('');
+    document.querySelectorAll('.kcol-head .add').forEach(b=>b.onclick=e=>{e.stopPropagation();LifeOS.create('project');});
+  }
+  function mountDetail(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-detail').content.cloneNode(true));
+    document.getElementById('dlMeta').innerHTML=LifeOS.icon('clock')+'30 Haziran';
+    document.getElementById('notesIc').innerHTML=LifeOS.icon('book')+' Notlar';
+    const tasks=[
+      {n:'Onboarding akışı',done:true},{n:'Dashboard tasarımı',done:true},{n:'Area detay sayfası',done:true},
+      {n:'Wireframe → UI dönüşümü',done:true,dep:false},{n:'UI tasarımı',done:false,dep:'Wireframe'},
+      {n:'Landing sayfası',done:false},{n:'App Store metadata',done:false}];
+    document.getElementById('pdTasks').innerHTML=`<div class="th">Görevler · 7/12</div>`+tasks.map(t=>`
+      <div class="tline"><div class="tcheck ${t.done?'done':''}" onclick="event.stopPropagation();this.classList.toggle('done')">${LifeOS.icon('check')}</div>
+        <span class="tn">${t.n}</span>${t.dep?`<span class="dep">${LifeOS.icon('link')} ${t.dep}</span>`:''}</div>`).join('')
+      +`<div class="addtask">${LifeOS.icon('plus')} Görev ekle…</div>`;
+  }
+  function mountEmpty(){content.innerHTML='';content.appendChild(document.getElementById('tpl-empty').content.cloneNode(true));
+    document.getElementById('emptyArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><rect x="16" y="22" width="20" height="52" rx="5" fill="#E8FAF7" stroke="#A2E9DF" stroke-width="2"/><rect x="40" y="22" width="20" height="52" rx="5" stroke="#A2E9DF" stroke-width="2" stroke-dasharray="4 5"/><rect x="64" y="22" width="20" height="52" rx="5" stroke="#A2E9DF" stroke-width="2" stroke-dasharray="4 5"/><rect x="20" y="28" width="12" height="9" rx="2" fill="#22BEB0"/><rect x="20" y="41" width="12" height="9" rx="2" fill="#A2E9DF"/></svg>`;}
+  function mountError(){content.innerHTML='';content.appendChild(document.getElementById('tpl-error').content.cloneNode(true));
+    document.getElementById('errArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><path d="M20 56a14 14 0 0 1 8-25 18 18 0 0 1 34 3 12 12 0 0 1 4 22z" stroke="#D2524A" stroke-width="2.2" fill="#FBE7E5"/><path d="M48 44v10M48 62h.01" stroke="#D2524A" stroke-width="2.8" stroke-linecap="round"/></svg>`;}
+
+  const states={main:mountMain,detail:mountDetail,empty:mountEmpty,error:mountError};
+  function go(s){states[s]();const sw=document.querySelector('.state-switch');sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x.dataset.st===s));}
+  window.go=go;
+
+  LifeOS.stateSwitch([{id:'main',label:'Liste'},{id:'detail',label:'Detay'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));states[b.dataset.st]();});
+  mountMain();
+</script>
+</body>
+</html>

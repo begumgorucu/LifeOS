@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Bildirimler</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  /* faded backdrop content */
+  .backdrop-content{padding:30px 34px;filter:blur(1px);opacity:.5;pointer-events:none;user-select:none}
+  .bc-greet{font-size:30px;font-weight:600;letter-spacing:-.02em}
+  .bc-date{color:var(--ink-3);font-size:14px;margin-top:5px}
+  .bc-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:24px;max-width:760px}
+  .bc-card{height:120px;background:var(--surface);border:1px solid var(--line);border-radius:14px}
+  .scrim{position:fixed;inset:0;background:rgba(20,15,35,.28);z-index:30}
+
+  /* notification panel */
+  .npanel{position:fixed;top:0;right:0;bottom:0;width:404px;max-width:92vw;background:var(--surface);
+    border-left:1px solid var(--line);z-index:40;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(36,24,70,.14);
+    animation:slidein .3s cubic-bezier(.2,.7,.2,1)}
+  @keyframes slidein{from{transform:translateX(40px)}to{transform:none}}
+  .np-head{padding:20px 22px 14px;border-bottom:1px solid var(--line)}
+  .np-top{display:flex;align-items:center;justify-content:space-between}
+  .np-top h2{font-size:18px;font-weight:600;letter-spacing:-.01em;display:flex;align-items:center;gap:9px}
+  .np-top .ub{background:var(--h-crit);color:#fff;font-size:11px;font-weight:600;border-radius:9px;padding:1px 7px;font-variant-numeric:tabular-nums}
+  .np-close{width:32px;height:32px;border-radius:8px;border:none;background:var(--surface-2);color:var(--ink-2);display:flex;align-items:center;justify-content:center}
+  .np-close svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none}
+  .np-tools{display:flex;align-items:center;justify-content:space-between;margin-top:14px}
+  .np-tabs{display:flex;gap:3px;background:var(--surface-2);border-radius:8px;padding:3px}
+  .np-tabs button{background:none;border:none;font-family:inherit;font-size:12.5px;font-weight:500;color:var(--ink-2);padding:5px 12px;border-radius:6px;white-space:nowrap}
+  .np-tabs button.on{background:var(--surface);color:var(--iris);box-shadow:0 1px 2px rgba(36,24,70,.06)}
+  .np-read{font-size:12.5px;color:var(--iris);background:none;border:none;font-family:inherit;font-weight:500;display:flex;align-items:center;gap:5px;white-space:nowrap}
+  .np-read svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+
+  .np-body{flex:1;overflow-y:auto;padding:8px 10px}
+  .np-group-h{font-family:var(--mono);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-4);padding:14px 12px 7px}
+  .nitem{display:flex;gap:13px;padding:13px 12px;border-radius:11px;transition:.15s;cursor:pointer;position:relative}
+  .nitem:hover{background:var(--surface-2)}
+  .nitem.unread{background:var(--i50)}
+  .nitem.unread:hover{background:var(--i100)}
+  .nicon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .nicon svg{width:18px;height:18px;stroke-width:1.9;fill:none}
+  .ni-warn{background:var(--h-crit-s);color:var(--h-crit)}
+  .ni-success{background:var(--gold-s);color:var(--gold)}
+  .ni-remind{background:var(--i50);color:var(--iris)}
+  .ni-dep{background:var(--h-exc-s);color:var(--h-exc)}
+  .ncontent{flex:1;min-width:0}
+  .ntitle{font-size:13.5px;line-height:1.4;color:var(--ink)}
+  .ntitle b{font-weight:600}
+  .nmeta{display:flex;align-items:center;gap:8px;margin-top:6px}
+  .ntime{font-family:var(--mono);font-size:11px;color:var(--ink-4)}
+  .narea{font-size:11px;color:var(--ink-3);display:flex;align-items:center;gap:4px}
+  .nunread-dot{position:absolute;top:16px;right:12px;width:8px;height:8px;border-radius:50%;background:var(--iris)}
+  .nactions{display:flex;gap:8px;margin-top:9px}
+  .nactions .na{font-size:12px;font-weight:500;color:var(--iris);background:var(--surface);border:1px solid var(--line-2);border-radius:7px;padding:5px 11px;text-decoration:none;white-space:nowrap}
+  .nactions .na:hover{border-color:var(--iris)}
+  .nactions .na.ghost{color:var(--ink-3);border-color:transparent}
+
+  .np-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 30px}
+  .np-empty .art{width:80px;height:80px;margin-bottom:20px}
+  .np-empty h3{font-size:17px;font-weight:600;margin-bottom:7px}
+  .np-empty p{font-size:13.5px;color:var(--ink-3);line-height:1.5;max-width:280px}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'dashboard',title:'Dashboard'});
+  // faded backdrop
+  content.parentElement.insertAdjacentHTML('beforeend',''); // noop
+  content.outerHTML=`<div class="content"><div class="backdrop-content">
+    <div class="bc-greet">Günaydın, Begüm.</div><div class="bc-date">Pazartesi, 2 Haziran 2026</div>
+    <div class="bc-cards"><div class="bc-card"></div><div class="bc-card"></div><div class="bc-card"></div></div>
+  </div></div>`;
+
+  const TYPE={
+    warn:{cls:'ni-warn',ic:'flame'},success:{cls:'ni-success',ic:'star'},
+    remind:{cls:'ni-remind',ic:'clock'},dep:{cls:'ni-dep',ic:'link'}
+  };
+  function nitem(n){
+    const t=TYPE[n.type];
+    let actions='';
+    if(n.type==='warn')actions=`<div class="nactions"><a class="na" href="04-area-detail.html">Şimdi ilgilen</a><a class="na ghost" href="#">Ertele</a></div>`;
+    if(n.type==='dep')actions=`<div class="nactions"><a class="na" href="06-tasks.html">Göreve git</a></div>`;
+    if(n.type==='remind')actions=`<div class="nactions"><a class="na" href="07-daily-pool.html">Günü başlat</a></div>`;
+    return `<div class="nitem ${n.unread?'unread':''}">
+      <div class="nicon ${t.cls}">${LifeOS.icon(t.ic)}</div>
+      <div class="ncontent">
+        <div class="ntitle">${n.title}</div>
+        <div class="nmeta"><span class="ntime">${n.time}</span>${n.area?`<span class="narea">· ${n.area}</span>`:''}</div>
+        ${actions}
+      </div>
+      ${n.unread?'<span class="nunread-dot"></span>':''}
+    </div>`;
+  }
+
+  function renderPanel(filter){
+    document.querySelectorAll('.scrim,.npanel').forEach(e=>e.remove());
+    document.body.insertAdjacentHTML('beforeend','<div class="scrim"></div>');
+    let list=LifeData.notifs;
+    if(filter==='unread')list=list.filter(n=>n.unread);
+    const today=list.filter(n=>n.time.includes('Bugün')||n.time.includes('saat'));
+    const earlier=list.filter(n=>!(n.time.includes('Bugün')||n.time.includes('saat')));
+    const unreadCount=LifeData.notifs.filter(n=>n.unread).length;
+    let body;
+    if(!list.length){
+      body=`<div class="np-empty"><div class="art">${emptyArt()}</div><h3>Hepsi okundu 🎉</h3><p>Yeni bildirimin yok. İhmal uyarıları, başarılar ve hatırlatmalar burada görünecek.</p></div>`;
+    } else {
+      body=`<div class="np-body">
+        ${today.length?`<div class="np-group-h">Bugün</div>`+today.map(nitem).join(''):''}
+        ${earlier.length?`<div class="np-group-h">Daha önce</div>`+earlier.map(nitem).join(''):''}
+      </div>`;
+    }
+    document.body.insertAdjacentHTML('beforeend',`<aside class="npanel">
+      <div class="np-head">
+        <div class="np-top"><h2>${LifeOS.icon('bell')} Bildirimler ${unreadCount?`<span class="ub">${unreadCount}</span>`:''}</h2>
+          <button class="np-close">${LifeOS.icon('x')}</button></div>
+        <div class="np-tools">
+          <div class="np-tabs"><button class="${filter!=='unread'?'on':''}" data-f="all">Tümü</button><button class="${filter==='unread'?'on':''}" data-f="unread">Okunmamış ${unreadCount}</button></div>
+          <button class="np-read">${LifeOS.icon('check')} Tümünü okundu işaretle</button>
+        </div>
+      </div>
+      ${body}
+    </aside>`);
+    document.querySelector('.np-read').onclick=()=>{document.querySelectorAll('.nitem').forEach(n=>n.classList.remove('unread'));document.querySelectorAll('.nunread-dot').forEach(d=>d.remove());document.querySelector('.np-top .ub')?.remove();};
+    document.querySelectorAll('.np-tabs button').forEach(b=>b.onclick=()=>renderPanel(b.dataset.f));
+  }
+  function emptyArt(){return `<svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="26" fill="#E6F4ED"/><path d="M30 40l7 7 14-15" stroke="#2E9E6B" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;}
+  function errPanel(){
+    document.querySelectorAll('.scrim,.npanel').forEach(e=>e.remove());
+    document.body.insertAdjacentHTML('beforeend','<div class="scrim"></div>');
+    document.body.insertAdjacentHTML('beforeend',`<aside class="npanel">
+      <div class="np-head"><div class="np-top"><h2>${LifeOS.icon('bell')} Bildirimler</h2><button class="np-close">${LifeOS.icon('x')}</button></div></div>
+      <div class="np-empty"><div class="art"><svg viewBox="0 0 80 80" fill="none"><circle cx="40" cy="40" r="26" fill="#FBE7E5"/><path d="M40 28v16M40 50h.01" stroke="#D2524A" stroke-width="3" stroke-linecap="round"/></svg></div>
+        <h3>Bildirimler yüklenemedi</h3><p>Bağlantı sorunu nedeniyle bildirimlerine ulaşamadık.</p>
+        <button class="btn pri" style="margin-top:18px" onclick="renderPanel('all')">Tekrar dene</button></div>
+    </aside>`);
+  }
+  window.renderPanel=renderPanel;
+
+  LifeOS.stateSwitch([{id:'main',label:'Ana hal'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    if(b.dataset.st==='main')renderPanel('all');
+    else if(b.dataset.st==='empty'){const o=LifeData.notifs;LifeData.notifs=[];renderPanel('all');LifeData.notifs=o;}
+    else errPanel();
+  });
+  renderPanel('all');
+</script>
+</body>
+</html>

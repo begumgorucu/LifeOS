@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Tasarım Genel Bakış</title>
+<link rel="stylesheet" href="assets/lifeos.css">
+<style>
+  body{background:var(--paper)}
+  .hub{max-width:1080px;margin:0 auto;padding:0 40px}
+  .hub-hero{padding:64px 0 40px;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .hub-hero::before{content:"";position:absolute;top:-140px;right:-60px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,var(--i100),transparent 68%)}
+  .hub-hero>*{position:relative;z-index:1}
+  .hub-brand{display:flex;align-items:center;gap:12px;margin-bottom:26px}
+  .hub-brand .sb-logo{width:38px;height:38px;border-radius:10px;font-size:18px}
+  .hub-brand b{font-size:20px;font-weight:600}.hub-brand b span{color:var(--ink-3)}
+  .hub-hero h1{font-size:46px;font-weight:600;letter-spacing:-.025em;line-height:1.05;max-width:760px}
+  .hub-hero h1 .hl{color:var(--iris)}
+  .hub-hero p{margin-top:18px;max-width:600px;font-size:17px;color:var(--ink-2);line-height:1.55}
+  .hub-meta{margin-top:26px;display:flex;gap:10px;flex-wrap:wrap}
+  .hub-meta a,.hub-meta span{font-size:13px;font-weight:500;padding:8px 14px;border-radius:9px;border:1px solid var(--line-2);background:var(--surface);color:var(--ink-2);text-decoration:none;display:inline-flex;align-items:center;gap:7px}
+  .hub-meta a:hover{border-color:var(--iris);color:var(--iris)}
+  .hub-meta a.pri{background:var(--iris);color:#fff;border-color:var(--iris)}
+  .hub-meta kbd{font-family:var(--mono);font-size:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:5px;padding:1px 6px}
+
+  .hub-sec{padding:46px 0;border-bottom:1px solid var(--line)}
+  .hub-sec-h{display:flex;align-items:baseline;gap:14px;margin-bottom:24px}
+  .hub-sec-h .n{font-family:var(--mono);font-size:13px;color:var(--iris)}
+  .hub-sec-h h2{font-size:14px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-2)}
+
+  .page-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.page-grid{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:600px){.page-grid{grid-template-columns:1fr}}
+  .pgcard{border:1px solid var(--line-2);border-radius:var(--r-lg);overflow:hidden;text-decoration:none;background:var(--surface);transition:.2s;display:block}
+  .pgcard:hover{transform:translateY(-3px);border-color:var(--iris);box-shadow:0 10px 28px rgba(36,24,70,.1)}
+  .pg-vis{height:96px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;border-bottom:1px solid var(--line)}
+  .pg-num{position:absolute;top:11px;left:13px;font-family:var(--mono);font-size:11px;color:var(--ink-3);background:var(--surface);padding:2px 7px;border-radius:6px;border:1px solid var(--line)}
+  .pg-body{padding:15px 16px}
+  .pg-body .t{font-size:15px;font-weight:600;letter-spacing:-.01em}
+  .pg-body .d{font-size:12.5px;color:var(--ink-3);margin-top:4px;line-height:1.45}
+  .pg-states{display:flex;gap:5px;margin-top:11px}
+  .pg-states span{font-size:10.5px;font-family:var(--mono);color:var(--ink-4);background:var(--surface-2);padding:2px 6px;border-radius:5px}
+
+  /* feature cards */
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:900px){.feat-grid{grid-template-columns:1fr}}
+  .feat{border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;background:var(--surface)}
+  .feat .fi{width:38px;height:38px;border-radius:10px;background:var(--i50);color:var(--iris);display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .feat .fi svg{width:19px;height:19px;stroke-width:1.8;fill:none}
+  .feat h3{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+  .feat .badge-done{font-size:10px;font-family:var(--mono);background:var(--h-exc-s);color:var(--h-exc-d);padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em}
+  .feat .badge-idea{font-size:10px;font-family:var(--mono);background:var(--i50);color:var(--iris);padding:2px 7px;border-radius:5px;text-transform:uppercase;letter-spacing:.04em}
+  .feat p{font-size:13px;color:var(--ink-2);line-height:1.5;margin-top:8px}
+
+  footer{padding:50px 0 90px;color:var(--ink-3);font-size:13px}
+</style>
+</head>
+<body>
+<template id="__bundler_thumbnail" data-bg-color="#0BA99B">
+  <svg viewBox="0 0 1200 800" xmlns="http://www.w3.org/2000/svg">
+    <rect width="1200" height="800" fill="#0BA99B"/>
+    <g transform="translate(600,400)">
+      <circle r="150" fill="none" stroke="#ffffff" stroke-width="10" opacity="0.35"/>
+      <path d="M0 -150 A150 150 0 0 1 130 75 L75 43 A87 87 0 0 0 0 -87 Z" fill="#ffffff" opacity="0.9"/>
+      <path d="M130 75 A150 150 0 0 1 -130 75 L-75 43 A87 87 0 0 0 75 43 Z" fill="#ffffff" opacity="0.6"/>
+      <path d="M-130 75 A150 150 0 0 1 0 -150 L0 -87 A87 87 0 0 0 -75 43 Z" fill="#ffffff" opacity="0.75"/>
+      <circle r="48" fill="#ffffff"/>
+      <text x="0" y="17" text-anchor="middle" font-family="Georgia,serif" font-size="56" font-weight="700" fill="#0BA99B">L</text>
+    </g>
+    <text x="600" y="660" text-anchor="middle" font-family="system-ui,sans-serif" font-size="40" font-weight="600" fill="#ffffff">LifeOS</text>
+  </svg>
+</template>
+<div class="hub">
+  <div class="hub-hero">
+    <div class="hub-brand"><div class="sb-logo">L</div><b>Life<span>OS</span></b></div>
+    <h1>Hayatını yöneten arayüz. <span class="hl">11 sayfa, tek tasarım dili.</span></h1>
+    <p>Notion'ın netliği, Apple Fitness'ın motivasyonu, Asana'nın iş takibi — Teal tonal sistem, sağlık skoru rampası ve oyunlaştırma katmanı üzerine kurulu. Her sayfa ana hal + boş durum + hata durumu içerir.</p>
+    <div class="hub-meta">
+      <a class="pri" href="pages/02-dashboard.html">Dashboard'u aç →</a>
+      <a href="Design Language.html">Tasarım dili</a>
+      <span>⌘K komut paleti her sayfada</span>
+      <span><kbd>?</kbd> klavye kısayolları</span>
+      <span>🌙 canlı koyu tema</span>
+    </div>
+  </div>
+
+  <!-- PAGES -->
+  <div class="hub-sec">
+    <div class="hub-sec-h"><span class="n">01</span><h2>11 Sayfa</h2></div>
+    <div class="page-grid" id="pageGrid"></div>
+  </div>
+
+  <!-- EXTRAS -->
+  <div class="hub-sec">
+    <div class="hub-sec-h"><span class="n">02</span><h2>Tasarımcı Eklentileri</h2></div>
+    <p style="color:var(--ink-2);font-size:15px;max-width:640px;margin-bottom:24px">Brief'te listelenmeyen ama sadakat ve akıcılık için eklediğim / önerdiğim yan özellikler:</p>
+    <div class="feat-grid" id="featGrid"></div>
+  </div>
+
+  <footer>LifeOS · Tasarım teslimi · Teal tonal sistem · Hanken Grotesk + Geist Mono · Begüm için tasarlandı</footer>
+</div>
+
+<script src="assets/lifeos.js"></script>
+<script>
+  const PAGES=[
+    {n:'01',f:'pages/01-onboarding.html',t:'Onboarding',d:'4 adımlı karşılama: hayaller + 24 alan şablonu + kutlama',grad:'linear-gradient(135deg,#0BA99B,#22BEB0)',ic:'sparkle',states:['Akış','Boş','Hata']},
+    {n:'02',f:'pages/02-dashboard.html',t:'Dashboard',d:'Karşılama, Daily Pool, alanlar, ihmal uyarıları, haftalık özet',grad:'linear-gradient(135deg,#E8FAF7,#CFF4EE)',ic:'dashboard',states:['Ana','Boş','Hata']},
+    {n:'03',f:'pages/03-areas.html',t:'Areas Liste',d:'Grid/liste, filtre, sıralama, hover quick actions',grad:'linear-gradient(135deg,#E6F4ED,#E8FAF7)',ic:'areas',states:['Ana','Boş','Hata']},
+    {n:'04',f:'pages/04-area-detail.html',t:'Area Detay',d:'Skor grafiği + Hedef Yolu roadmap + sekmeler',grad:'linear-gradient(135deg,#FBE7E5,#E8FAF7)',ic:'target',states:['Ana','Boş','Hata']},
+    {n:'05',f:'pages/05-projects.html',t:'Projects',d:'Kanban liste + proje detay (bağımlılık, notlar)',grad:'linear-gradient(135deg,#0BA99B,#0A8C82)',ic:'projects',states:['Liste','Detay','Boş','Hata']},
+    {n:'06',f:'pages/06-tasks.html',t:'Tasks',d:'Sekmeli liste, inline ekleme, öncelik, bağımlılık',grad:'linear-gradient(135deg,#F8F0DC,#FBEDDF)',ic:'tasks',states:['Ana','Boş','Hata']},
+    {n:'07',f:'pages/07-daily-pool.html',t:'Daily Pool',d:'Sabah ritüeli — 5 akıllı öneri, neden + onay',grad:'linear-gradient(135deg,#22BEB0,#0BA99B)',ic:'pool',states:['Ana','Boş','Hata']},
+    {n:'08',f:'pages/08-vision-board.html',t:'Vision Board ⭐',d:'Masonry pano — skor düşünce hayal soluyor',grad:'linear-gradient(135deg,#0E9C90,#22BEB0)',ic:'vision',states:['Ana','Boş','Hata']},
+    {n:'09',f:'pages/09-stats.html',t:'Statistics',d:'Trend grafiği, aktivite heatmap, rozetler',grad:'linear-gradient(135deg,#E6F4ED,#CFF4EE)',ic:'stats',states:['Ana','Boş','Hata']},
+    {n:'10',f:'pages/10-settings.html',t:'Settings',d:'Profil, canlı koyu tema, dil, bildirimler, veri',grad:'linear-gradient(135deg,#1D2A28,#0F1A18)',ic:'settings',states:['Ana','Boş','Hata']},
+    {n:'11',f:'pages/11-notifications.html',t:'Bildirimler',d:'Sağdan açılan panel — uyarı/başarı/hatırlatma',grad:'linear-gradient(135deg,#FBEDDF,#FBE7E5)',ic:'bell',states:['Ana','Boş','Hata']},
+  ];
+  document.getElementById('pageGrid').innerHTML=PAGES.map(p=>{
+    const dark=['#0BA99B','#0E9C90','#0A8C82','#0F1A18','#1D2A28','#22BEB0'].some(c=>p.grad.includes(c));
+    return `<a class="pgcard" href="${p.f}">
+      <div class="pg-vis" style="background:${p.grad}">
+        <span class="pg-num">${p.n}</span>
+        <span style="color:${dark?'#fff':'var(--iris)'}">${LifeOS.icon(p.ic)}</span>
+      </div>
+      <div class="pg-body"><div class="t">${p.t}</div><div class="d">${p.d}</div>
+        <div class="pg-states">${p.states.map(s=>`<span>${s}</span>`).join('')}</div></div>
+    </a>`;
+  }).join('');
+  // make page icons bigger
+  document.querySelectorAll('.pg-vis svg').forEach(s=>{s.setAttribute('width','30');s.setAttribute('height','30');});
+
+  const FEATS=[
+    {ic:'search',t:'⌘K Komut Paleti',done:true,d:'Linear/Notion tarzı — her yerden görev ekle, sayfa ara, gez. Klavyeyle tam kullanılabilir.'},
+    {ic:'info',t:'? Kısayol Menüsü',done:true,d:'Tek tuşla tüm klavye kısayolları. Güç kullanıcıları için akıcılık.'},
+    {ic:'moon',t:'Canlı Koyu Tema',done:true,d:'Ayarlardan anında geçiş, yumuşak animasyonla. Iris koyuda da güçlü.'},
+    {ic:'star',t:'Achievement Unlock',done:true,d:'Rozet kazanınca sağ üstte kayan kutlama kartı — ölçülü, çocuksu değil.'},
+    {ic:'flame',t:'Streak Risk Uyarısı',idea:true,d:'Gün bitmeden hiç görev yapılmadıysa: "Streak\'in tehlikede" nazik uyarı.'},
+    {ic:'bolt',t:'Hızlı Toparlanma',done:true,d:'İhmal edilen alanda tek tıkla küçük görev önerisi — skoru hemen +5.'},
+    {ic:'calendar',t:'Haftalık Değerlendirme',idea:true,d:'Pazar akşamı ritüeli: haftayı gözden geçir, gelecek haftayı planla.'},
+    {ic:'link',t:'Bağımlılık DAG Görünümü',idea:true,d:'Görev bağımlılıklarının graph görseli — "neyin neyi beklediği".'},
+    {ic:'target',t:'Odak Modu',idea:true,d:'Tek göreve kilitlenme + Pomodoro sayacı, dağınıklığı gizler.'},
+  ];
+  document.getElementById('featGrid').innerHTML=FEATS.map(f=>`
+    <div class="feat"><div class="fi">${LifeOS.icon(f.ic)}</div>
+      <h3>${f.t} ${f.done?'<span class="badge-done">Hazır</span>':'<span class="badge-idea">Öneri</span>'}</h3>
+      <p>${f.d}</p></div>`).join('');
+</script>
+</body>
+</html>

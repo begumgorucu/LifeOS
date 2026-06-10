@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Statistics</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  .shead{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px;flex-wrap:wrap}
+  .shead h1{font-size:26px;font-weight:600;letter-spacing:-.02em}
+  .shead .sub{color:var(--ink-3);font-size:14px;margin-top:3px}
+
+  .stat-cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+  @media(max-width:900px){.stat-cards{grid-template-columns:repeat(2,1fr)}}
+  .scard{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;position:relative;overflow:hidden}
+  .scard .ic{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+  .scard .ic svg{width:17px;height:17px;stroke-width:1.8;fill:none}
+  .scard .v{font-size:28px;font-weight:600;letter-spacing:-.02em;line-height:1}
+  .scard .l{font-size:12.5px;color:var(--ink-3);margin-top:6px}
+  .scard .delta{position:absolute;top:18px;right:18px;font-size:11.5px;font-weight:500;padding:2px 7px;border-radius:6px}
+  .delta.up{background:var(--h-exc-s);color:var(--h-exc-d)}
+  .delta.down{background:var(--h-crit-s);color:var(--h-crit-d)}
+
+  .stat-grid{display:grid;grid-template-columns:1.6fr 1fr;gap:18px;align-items:start}
+  @media(max-width:1000px){.stat-grid{grid-template-columns:1fr}}
+  .panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;margin-bottom:18px}
+  .panel-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+  .panel-h h3{font-size:15px;font-weight:600;white-space:nowrap}
+  .panel-h .legend{display:flex;gap:14px;flex-wrap:wrap}
+  .panel-h .lg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--ink-2)}
+  .panel-h .lg .ln{width:14px;height:3px;border-radius:2px}
+
+  /* heatmap */
+  .heat{display:flex;gap:3px;overflow-x:auto;padding-bottom:4px}
+  .heat-col{display:flex;flex-direction:column;gap:3px}
+  .heat-cell{width:13px;height:13px;border-radius:3px;background:var(--surface-2)}
+  .heat-labels{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:8px}
+  .heat-foot{display:flex;align-items:center;gap:8px;justify-content:flex-end;font-size:11px;color:var(--ink-3);margin-top:12px}
+  .heat-foot .scale{display:flex;gap:3px}
+  .heat-foot .scale i{width:12px;height:12px;border-radius:3px}
+
+  /* top performers */
+  .perf{display:flex;align-items:center;gap:13px;padding:12px 0;border-top:1px solid var(--line)}
+  .perf:first-of-type{border-top:none}
+  .perf .rank{width:24px;font-family:var(--mono);font-size:14px;font-weight:600;color:var(--ink-4)}
+  .perf .pic{width:36px;height:36px;border-radius:10px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:17px}
+  .perf .pn{flex:1}.perf .pn .t{font-size:14px;font-weight:500}.perf .pn .d{font-size:12px;color:var(--ink-3)}
+  .perf .chg{font-size:13px;font-weight:600;color:var(--h-exc-d);display:flex;align-items:center;gap:3px}
+
+  /* achievements grid */
+  .ach-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+  .ach-c{border:1px solid var(--line);border-radius:12px;padding:16px;text-align:center;position:relative}
+  .ach-c.locked{opacity:.6;background:var(--surface-2)}
+  .ach-c .medal{width:48px;height:48px;border-radius:50%;margin:0 auto 11px;display:flex;align-items:center;justify-content:center;font-size:22px}
+  .ach-c .medal.on{background:radial-gradient(circle at 35% 30%,#F6D98B,var(--gold));box-shadow:inset 0 0 0 3px rgba(255,255,255,.5)}
+  .ach-c .medal.off{background:var(--surface-3);box-shadow:inset 0 0 0 2.5px var(--line-2);font-size:19px}
+  .ach-c .an{font-size:13px;font-weight:600}.ach-c .ad{font-size:11.5px;color:var(--ink-3);margin-top:3px}
+  .ach-c .miniprog{height:5px;border-radius:3px;background:var(--surface-3);overflow:hidden;margin-top:10px}
+  .ach-c .miniprog>i{display:block;height:100%;background:var(--gold)}
+
+  .period-seg{display:inline-flex;background:var(--surface-2);border-radius:9px;padding:3px}
+  .period-seg button{background:none;border:none;font-family:inherit;font-size:13px;font-weight:500;color:var(--ink-2);padding:6px 14px;border-radius:7px}
+  .period-seg button.on{background:var(--surface);color:var(--iris);box-shadow:0 1px 2px rgba(36,24,70,.06)}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<template id="tpl-main">
+  <div class="shead">
+    <div><h1>İstatistikler</h1><div class="sub">Haziran 2026 · ilerlemenin tam resmi</div></div>
+    <div class="period-seg"><button class="on">Ay</button><button>Yıl</button><button>Tümü</button></div>
+  </div>
+
+  <div class="stat-cards" id="statCards"></div>
+
+  <div class="stat-grid">
+    <div>
+      <div class="panel">
+        <div class="panel-h"><h3>Alan skorları · 30 gün</h3>
+          <div class="legend" id="trendLegend"></div></div>
+        <div id="trendChart"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h3>Aktivite haritası</h3><span class="muted" style="font-size:12.5px">Son 16 hafta</span></div>
+        <div class="heat" id="heat"></div>
+        <div class="heat-labels"><span>Şub</span><span>Mar</span><span>Nis</span><span>May</span><span>Haz</span></div>
+        <div class="heat-foot">Az <div class="scale" id="heatScale"></div> Çok</div>
+      </div>
+    </div>
+    <div>
+      <div class="panel">
+        <div class="panel-h"><h3>En çok ilerleyen</h3></div>
+        <div id="perfList"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-h"><h3>Rozetler</h3><span class="muted" style="font-size:12.5px">6/12</span></div>
+        <div class="ach-grid" id="achGrid"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-empty">
+  <div class="shead"><div><h1>İstatistikler</h1></div></div>
+  <div class="state-block">
+    <div class="state-art" id="emptyArt"></div>
+    <h2>Henüz gösterecek veri yok.</h2>
+    <p>Birkaç gün görev tamamladıkça buradaki grafikler, ısı haritası ve rozetler dolmaya başlayacak. İlk haftanı tamamla.</p>
+    <div class="state-actions"><a class="btn pri lg" href="07-daily-pool.html">Bugüne başla</a><a class="state-link" href="02-dashboard.html">Dashboard'a dön</a></div>
+  </div>
+</template>
+
+<template id="tpl-error">
+  <div class="shead"><div><h1>İstatistikler</h1></div></div>
+  <div class="state-block">
+    <div class="state-art" id="errArt"></div>
+    <h2>Analizler hesaplanamadı.</h2>
+    <p>İstatistik verileri toplanırken bir sorun oluştu. Birazdan tekrar dene.</p>
+    <div class="state-actions"><button class="btn pri lg" onclick="this.textContent='Deneniyor…';setTimeout(()=>location.reload(),900)">Tekrar dene</button><a class="state-link" href="#">Sorunu bildir</a></div>
+  </div>
+</template>
+
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'stats',title:'Stats'});
+
+  function mountMain(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-main').content.cloneNode(true));
+    // stat cards
+    const cards=[
+      {ic:'check',col:'iris',v:'35',l:'Bu ay tamamlanan',d:'+20%',up:true},
+      {ic:'flame',col:'gold',v:'7',l:'Güncel streak',d:'en uzun 12',up:true},
+      {ic:'stats',col:'exc',v:'68%',l:'Tamamlama oranı',d:'+6%',up:true},
+      {ic:'areas',col:'warn',v:'Sağlık',l:'En aktif alan',d:'14 görev',up:true},
+    ];
+    const colMap={iris:['var(--i50)','var(--iris)'],gold:['var(--gold-s)','var(--gold)'],exc:['var(--h-exc-s)','var(--h-exc)'],warn:['var(--h-warn-s)','var(--h-warn)']};
+    document.getElementById('statCards').innerHTML=cards.map(c=>`
+      <div class="scard"><div class="ic" style="background:${colMap[c.col][0]};color:${colMap[c.col][1]}">${LifeOS.icon(c.ic)}</div>
+        <div class="v tnum">${c.v}</div><div class="l">${c.l}</div>
+        <span class="delta ${c.up?'up':'down'}">${c.up?'↑':'↓'} ${c.d}</span></div>`).join('');
+
+    // trend chart (multi-line)
+    const series=[
+      {n:'Sağlık',c:'#2E9E6B',data:[68,70,72,71,74,76,78,80,82]},
+      {n:'Kariyer',c:'#0BA99B',data:[55,57,54,58,60,62,61,63,64]},
+      {n:'Almanca',c:'#D2524A',data:[70,64,58,52,46,40,34,28,24]},
+    ];
+    document.getElementById('trendLegend').innerHTML=series.map(s=>`<span class="lg"><span class="ln" style="background:${s.c}"></span>${s.n}</span>`).join('');
+    document.getElementById('trendChart').innerHTML=multiLine(series);
+
+    // heatmap 16 weeks x 7 days
+    const weeks=16;let cells='';
+    for(let w=0;w<weeks;w++){let col='';for(let d=0;d<7;d++){
+      const recent=w>weeks-3;const lvl=Math.random()<0.22?0:Math.min(4,1+Math.floor(Math.random()*4)+(recent?1:0));
+      const shades=['var(--surface-2)','#CFF4EE','#66D6C8','#22BEB0','#0BA99B'];
+      col+=`<div class="heat-cell" style="background:${shades[Math.min(lvl,4)]}" title="${lvl} görev"></div>`;}
+      cells+=`<div class="heat-col">${col}</div>`;}
+    document.getElementById('heat').innerHTML=cells;
+    document.getElementById('heatScale').innerHTML=['var(--surface-2)','#CFF4EE','#66D6C8','#22BEB0','#0BA99B'].map(s=>`<i style="background:${s}"></i>`).join('');
+
+    // top performers
+    const perf=[['🌿','Sağlık','82 skor · 14 görev','+14'],['💰','Para','71 skor · 8 görev','+9'],['📚','Kitap','77 skor · 11 görev','+7']];
+    document.getElementById('perfList').innerHTML=perf.map((p,i)=>`
+      <div class="perf"><span class="rank">${i+1}</span><div class="pic">${p[0]}</div>
+        <div class="pn"><div class="t">${p[1]}</div><div class="d">${p[2]}</div></div>
+        <span class="chg">${LifeOS.icon('arrow')} ${p[3]}</span></div>`).join('');
+
+    // achievements
+    const ach=[
+      {n:'İlk 100 Görev',d:'Bugün kazanıldı',on:true,em:'★'},
+      {n:'7 Günlük Streak',d:'Bugün kazanıldı',on:true,em:'🔥'},
+      {n:'Mükemmel Alan',d:'Bir alanı 90+ tut',on:true,em:'💎'},
+      {n:'Erken Kuş',d:'10 sabah 09:00 önce',on:true,em:'🌅'},
+      {n:'30 Günlük Streak',d:'7/30',on:false,prog:23,em:'🔒'},
+      {n:'500 Görev',d:'247/500',on:false,prog:49,em:'🔒'},
+    ];
+    document.getElementById('achGrid').innerHTML=ach.map(a=>`
+      <div class="ach-c ${a.on?'':'locked'}"><div class="medal ${a.on?'on':'off'}">${a.on?a.em:'🔒'}</div>
+        <div class="an">${a.n}</div><div class="ad">${a.d}</div>
+        ${!a.on?`<div class="miniprog"><i style="width:${a.prog}%"></i></div>`:''}</div>`).join('');
+  }
+
+  function multiLine(series,w=560,h=170){
+    const pad=8,cw=w-pad*2,ch=h-pad*2,n=series[0].data.length;
+    const yFor=v=>pad+(1-v/100)*ch;
+    let grid='';[70,50,30].forEach(v=>{grid+=`<line x1="${pad}" y1="${yFor(v)}" x2="${w-pad}" y2="${yFor(v)}" stroke="var(--line)" stroke-width="1"/>`;});
+    const lines=series.map(s=>{
+      const pts=s.data.map((v,i)=>[pad+i/(n-1)*cw,yFor(v)]);
+      const path=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+      const last=pts[pts.length-1];
+      return `<path d="${path}" fill="none" stroke="${s.c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="${last[0]}" cy="${last[1]}" r="4" fill="${s.c}" stroke="#fff" stroke-width="2"/>`;
+    }).join('');
+    return `<svg width="100%" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="display:block">${grid}${lines}</svg>
+      <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:6px"><span>4 May</span><span>18 May</span><span>2 Haz</span></div>`;
+  }
+
+  function mountEmpty(){content.innerHTML='';content.appendChild(document.getElementById('tpl-empty').content.cloneNode(true));
+    document.getElementById('emptyArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><path d="M18 70V44M34 70V30M50 70V52M66 70V36M82 70V22" stroke="#A2E9DF" stroke-width="3.5" stroke-linecap="round"/><path d="M14 78h70" stroke="#22BEB0" stroke-width="2.4" stroke-linecap="round"/></svg>`;}
+  function mountError(){content.innerHTML='';content.appendChild(document.getElementById('tpl-error').content.cloneNode(true));
+    document.getElementById('errArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="30" fill="#FBF1D9"/><path d="M48 34v18M48 60h.01" stroke="#E0A82E" stroke-width="3.2" stroke-linecap="round"/></svg>`;}
+
+  LifeOS.stateSwitch([{id:'main',label:'Ana hal'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));({main:mountMain,empty:mountEmpty,error:mountError})[b.dataset.st]();});
+  mountMain();
+</script>
+</body>
+</html>

@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LifeOS — Area Detay</title>
+<link rel="stylesheet" href="../assets/lifeos.css">
+<style>
+  .crumbnav{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-3);margin-bottom:18px}
+  .crumbnav a{color:var(--ink-3);text-decoration:none}.crumbnav a:hover{color:var(--iris)}
+  .crumbnav svg{width:14px;height:14px;stroke:currentColor;stroke-width:2;fill:none}
+
+  .detail-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;align-items:start}
+  @media(max-width:1040px){.detail-grid{grid-template-columns:1fr}}
+
+  /* header card */
+  .head-card{background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:24px;margin-bottom:20px;position:relative;overflow:hidden}
+  .head-card.neg{border-color:#F0CFCB}
+  .head-card.neg::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--h-crit)}
+  .hc-top{display:flex;align-items:flex-start;gap:18px}
+  .hc-ic{width:56px;height:56px;border-radius:14px;background:var(--surface-2);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
+  .head-card.neg .hc-ic{background:var(--h-crit-s)}
+  .hc-info{flex:1;min-width:0}
+  .hc-info h1{font-size:25px;font-weight:600;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  .hc-info .desc{font-size:14px;color:var(--ink-3);margin-top:3px}
+  .neg-badge{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--h-crit-d);background:var(--h-crit-s);padding:4px 10px;border-radius:7px}
+  .neg-badge .pd{width:7px;height:7px;border-radius:50%;background:var(--h-crit);animation:pulse 2s infinite}
+  .hc-ring{flex-shrink:0;text-align:center}
+  .hc-ring .delta{font-size:12px;color:var(--h-crit-d);font-weight:500;margin-top:6px}
+
+  .hc-msg{margin-top:18px;padding:13px 16px;border-radius:11px;background:var(--h-crit-s);font-size:13.5px;color:var(--h-crit-d);display:flex;align-items:center;gap:10px}
+  .hc-msg svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none;flex-shrink:0}
+
+  /* score chart */
+  .chart-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px;margin-bottom:20px}
+  .chart-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+  .chart-head h3{font-size:15px;font-weight:600}
+  .chart-head .rng{font-size:12.5px;color:var(--ink-3)}
+  .chart-wrap{position:relative}
+  .chart-stats{display:flex;gap:28px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+  .cs-item .l{font-family:var(--mono);font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-4);margin-bottom:5px}
+  .cs-item .v{font-size:18px;font-weight:600;letter-spacing:-.01em}
+
+  /* roadmap (signature) */
+  .road-card{background:linear-gradient(135deg,var(--i50),var(--surface) 55%);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:24px;margin-bottom:20px}
+  .road-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+  .road-head .rt{display:flex;align-items:center;gap:10px}
+  .road-head .ic{width:32px;height:32px;border-radius:9px;background:var(--iris);color:#fff;display:flex;align-items:center;justify-content:center}
+  .road-head .ic svg{width:17px;height:17px;stroke:currentColor;stroke-width:2;fill:none}
+  .road-head h3{font-size:16px;font-weight:600;white-space:nowrap}
+  .road-head .tag{background:var(--surface);border:1px solid var(--line-2);color:var(--iris);font-weight:500}
+  .road-sub{font-size:13px;color:var(--ink-2);margin:2px 0 26px 42px}
+  .road-sub b{color:var(--iris)}
+  .track{position:relative;display:flex;justify-content:space-between;padding:0 6px}
+  .track::before{content:"";position:absolute;top:13px;left:20px;right:20px;height:2px;background:var(--line-2)}
+  .track .fill{position:absolute;top:13px;left:20px;height:2px;background:linear-gradient(90deg,var(--i400),var(--iris));border-radius:2px}
+  .node{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:9px;flex:1}
+  .node .pt{width:28px;height:28px;border-radius:50%;background:var(--surface);border:2px solid var(--line-2);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--ink-3);font-weight:600}
+  .node .pt svg{width:13px;height:13px;stroke:#fff;stroke-width:3;fill:none}
+  .node.done .pt{background:var(--iris);border-color:var(--iris);color:#fff}
+  .node.now .pt{border-color:var(--iris);color:var(--iris);box-shadow:0 0 0 4px var(--i50)}
+  .node .nl{font-size:12px;font-weight:500;text-align:center;color:var(--ink-3)}
+  .node .nd{font-family:var(--mono);font-size:10px;color:var(--ink-4)}
+  .node.done .nl,.node.now .nl{color:var(--ink)}
+
+  /* tabs */
+  .tabwrap{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden}
+  .tabwrap .tabs{padding:0 18px}
+  .tabbody{padding:18px}
+  .proj-row{display:flex;align-items:center;gap:14px;padding:14px;border-radius:10px;transition:.15s}
+  .proj-row:hover{background:var(--surface-2)}
+  .proj-row .pic{width:36px;height:36px;border-radius:9px;background:var(--i50);color:var(--iris);display:flex;align-items:center;justify-content:center}
+  .proj-row .pic svg{width:18px;height:18px;stroke:currentColor;stroke-width:1.8;fill:none}
+  .proj-row .pi{flex:1;min-width:0}
+  .proj-row .pn{font-size:14px;font-weight:500}
+  .proj-row .pbar{height:5px;border-radius:3px;background:var(--surface-2);overflow:hidden;margin-top:8px;max-width:300px}
+  .proj-row .pbar>i{display:block;height:100%;background:var(--iris);border-radius:3px}
+  .proj-row .pmeta{font-size:12px;color:var(--ink-3);margin-top:5px}
+  .proj-row .pprog{font-family:var(--mono);font-size:13px;color:var(--ink-2);white-space:nowrap}
+
+  .task-line{display:flex;align-items:center;gap:12px;padding:11px 8px;border-bottom:1px solid var(--line)}
+  .task-line:last-child{border-bottom:none}
+  .tcheck{width:19px;height:19px;border-radius:6px;border:1.6px solid var(--line-3);flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .tcheck.done{background:var(--iris);border-color:var(--iris)}.tcheck svg{width:12px;height:12px;stroke:#fff;stroke-width:3;fill:none;opacity:0}.tcheck.done svg{opacity:1}
+  .task-line .tn{flex:1;font-size:14px}.tcheck.done ~ .tn{text-decoration:line-through;color:var(--ink-3)}
+  .pri-dot{width:7px;height:7px;border-radius:50%}
+
+  .hist-item{display:flex;gap:13px;padding:11px 0;border-bottom:1px solid var(--line)}
+  .hist-item:last-child{border:none}
+  .hist-item .hd{width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0}
+  .hist-item .ht{font-size:13.5px}.hist-item .htime{font-family:var(--mono);font-size:11.5px;color:var(--ink-4);margin-top:2px}
+  .hist-item .hpts{margin-left:auto;font-family:var(--mono);font-size:12.5px;font-weight:500;white-space:nowrap}
+
+  /* right rail */
+  .rail-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:18px;margin-bottom:16px}
+  .rail-card h3{font-size:13px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;white-space:nowrap}
+  .rail-card h3 .ic{color:var(--ink-3)}.rail-card h3 .ic svg{width:15px;height:15px;stroke:currentColor;stroke-width:1.8;fill:none}
+  .setting-row{display:flex;align-items:center;gap:11px;padding:9px 0;font-size:13.5px;color:var(--ink-2);border-top:1px solid var(--line);cursor:pointer;transition:.15s}
+  .setting-row:first-of-type{border-top:none}
+  .setting-row:hover{color:var(--iris)}
+  .setting-row svg{width:16px;height:16px;stroke:currentColor;stroke-width:1.8;fill:none}
+  .setting-row.danger{color:var(--h-crit-d)}
+  .color-dots{display:flex;gap:7px;margin-top:4px}
+  .color-dots i{width:22px;height:22px;border-radius:7px;cursor:pointer;border:2px solid transparent}
+  .color-dots i.on{border-color:var(--ink)}
+  .vis-link{display:flex;align-items:center;gap:11px;padding:11px 0;border-top:1px solid var(--line)}
+  .vis-link:first-of-type{border-top:none}
+  .vis-link .vt{font-size:13.5px;font-weight:500;flex:1}
+  .vis-link .vp{font-family:var(--mono);font-size:11.5px;color:var(--ink-3)}
+</style>
+</head>
+<body>
+<div class="app"></div>
+
+<template id="tpl-main">
+  <div class="crumbnav"><a href="03-areas.html">Areas</a> <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg> <span style="color:var(--ink-2)">Almanca</span></div>
+
+  <div class="detail-grid">
+    <div>
+      <!-- header -->
+      <div class="head-card neg">
+        <div class="hc-top">
+          <div class="hc-ic">🗣️</div>
+          <div class="hc-info">
+            <h1>Almanca <span class="neg-badge"><span class="pd"></span>İhmal ediliyor</span></h1>
+            <div class="desc">B2 yolunda · 8 gündür dokunmadın</div>
+          </div>
+          <div class="hc-ring" id="hcRing"></div>
+        </div>
+        <div class="hc-msg" id="hcMsg"></div>
+      </div>
+
+      <!-- roadmap -->
+      <div class="road-card">
+        <div class="road-head">
+          <div class="rt"><div class="ic" id="roadIc"></div><h3>Hedef Yolu</h3></div>
+          <span class="tag b-iris">Hedef · Eylül 2026</span>
+        </div>
+        <div class="road-sub">Almanca'da <b>B2 seviyesine ulaş</b> · 5 kilometre taşından 2'si tamam · <b>%46</b> yolda</div>
+        <div class="track" id="track"></div>
+      </div>
+
+      <!-- score chart -->
+      <div class="chart-card">
+        <div class="chart-head"><h3>Skor değişimi</h3><span class="rng">Son 30 gün</span></div>
+        <div class="chart-wrap" id="chartWrap"></div>
+        <div class="chart-stats">
+          <div class="cs-item"><div class="l">Bu ay tamamlanan</div><div class="v tnum">9 görev</div></div>
+          <div class="cs-item"><div class="l">En yüksek skor</div><div class="v tnum">71 <span style="font-size:12px;color:var(--ink-3)">· 14 May</span></div></div>
+          <div class="cs-item"><div class="l">En uzun streak</div><div class="v tnum">12 gün</div></div>
+        </div>
+      </div>
+
+      <!-- tabs -->
+      <div class="tabwrap">
+        <div class="tabs" id="tabs">
+          <button class="on" data-t="proj">Projeler <span class="muted">1</span></button>
+          <button data-t="task">Görevler <span class="muted">2</span></button>
+          <button data-t="hist">Geçmiş</button>
+          <button data-t="stat">İstatistik</button>
+          <button data-t="vis">Bağlı Hayaller <span class="muted">2</span></button>
+        </div>
+        <div class="tabbody" id="tabBody"></div>
+      </div>
+    </div>
+
+    <!-- right rail -->
+    <div>
+      <div class="rail-card">
+        <h3><span class="ic" id="setIc"></span>Alan ayarları</h3>
+        <div class="setting-row" id="renameRow">Yeniden adlandır</div>
+        <div class="setting-row" style="display:block">Renk
+          <div class="color-dots"><i class="on" style="background:#0BA99B"></i><i style="background:#2E9E6B"></i><i style="background:#DC7E33"></i><i style="background:#C79221"></i><i style="background:#D2524A"></i></div>
+        </div>
+        <div class="setting-row" id="archRow">Arşivle</div>
+        <div class="setting-row danger" id="delRow">Alanı sil</div>
+      </div>
+
+      <div class="rail-card">
+        <h3><span class="ic" id="visIcon"></span>Bağlı hayaller</h3>
+        <div class="vis-link"><span style="font-size:18px">🇪🇺</span><span class="vt">Avrupa'da yaşamak</span><span class="vp">2 alan</span></div>
+        <div class="vis-link"><span style="font-size:18px">🗣️</span><span class="vt">Almanca B2</span><span class="vp">1 alan</span></div>
+        <a href="08-vision-board.html" style="display:block;margin-top:12px;font-size:13px;color:var(--iris);text-decoration:none">Vision Board'da gör →</a>
+      </div>
+
+      <div class="rail-card" style="background:var(--h-crit-s);border-color:#F0CFCB">
+        <h3 style="color:var(--h-crit-d)">Hızlı toparlanma</h3>
+        <p style="font-size:13px;color:var(--h-crit-d);margin-bottom:13px;line-height:1.5">Bugün 1 küçük görev bile skoru +5 yükseltir. Hadi başlayalım.</p>
+        <button class="btn pri" style="width:100%;justify-content:center" id="recoverBtn">İlk görevi yap</button>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-empty">
+  <div class="crumbnav"><a href="03-areas.html">Areas</a> <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg> <span style="color:var(--ink-2)">Yeni alan</span></div>
+  <div class="state-block">
+    <div class="state-art" id="emptyArt"></div>
+    <h2>Bu alan henüz boş.</h2>
+    <p>İlk projeni veya görevini ekle, bir hedef belirle. Hedef Yolu'nu oluşturduğunda ilerlemeni burada izleyeceksin.</p>
+    <div class="state-actions">
+      <button class="btn pri lg" id="addProjBtn">İlk projeyi ekle</button>
+      <a class="state-link" href="#">Hedef belirle</a>
+    </div>
+  </div>
+</template>
+
+<template id="tpl-error">
+  <div class="crumbnav"><a href="03-areas.html">Areas</a> <svg viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg> <span style="color:var(--ink-2)">Almanca</span></div>
+  <div class="state-block">
+    <div class="state-art" id="errArt"></div>
+    <h2>Alan detayı yüklenemedi.</h2>
+    <p>Bu alanın verilerine şu an ulaşamıyoruz. Skor ve görevler güncellenemedi.</p>
+    <div class="state-actions">
+      <button class="btn pri lg" onclick="this.textContent='Deneniyor…';setTimeout(()=>location.reload(),900)">Tekrar dene</button>
+      <a class="state-link" href="#">Sorunu bildir</a>
+    </div>
+  </div>
+</template>
+
+<script src="../assets/lifeos.js"></script>
+<script src="../assets/data.js"></script>
+<script>
+  const content=LifeOS.shell({active:'areas',title:'Almanca',crumb:'Areas'});
+
+  // 30-day declining score data
+  const scoreData=[70,69,67,71,68,66,64,62,65,63,60,58,61,59,56,54,57,55,52,50,48,46,44,42,40,36,32,29,26,24];
+
+  function lineChart(data,w=620,h=140){
+    const max=100,min=0,pad=6;const cw=w-pad*2,ch=h-pad*2;
+    const pts=data.map((v,i)=>[pad+i/(data.length-1)*cw, pad+(1-(v-min)/(max-min))*ch]);
+    const path=pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');
+    const area=path+` L${(pad+cw).toFixed(1)} ${(pad+ch).toFixed(1)} L${pad} ${(pad+ch).toFixed(1)} Z`;
+    // threshold lines at 70,50,30
+    const yFor=v=>pad+(1-v/100)*ch;
+    const last=pts[pts.length-1];
+    return `<svg width="100%" viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="display:block">
+      <defs><linearGradient id="ag" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#D2524A" stop-opacity=".18"/><stop offset="1" stop-color="#D2524A" stop-opacity="0"/></linearGradient></defs>
+      <line x1="${pad}" y1="${yFor(70)}" x2="${w-pad}" y2="${yFor(70)}" stroke="#E6F4ED" stroke-width="1"/>
+      <line x1="${pad}" y1="${yFor(50)}" x2="${w-pad}" y2="${yFor(50)}" stroke="#F8F0DC" stroke-width="1"/>
+      <line x1="${pad}" y1="${yFor(30)}" x2="${w-pad}" y2="${yFor(30)}" stroke="#FBEDDF" stroke-width="1"/>
+      <path d="${area}" fill="url(#ag)"/>
+      <path d="${path}" fill="none" stroke="#D2524A" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="${last[0]}" cy="${last[1]}" r="4.5" fill="#D2524A" stroke="#fff" stroke-width="2"/>
+    </svg>
+    <div style="display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--ink-4);margin-top:6px"><span>4 May</span><span>18 May</span><span>2 Haz · bugün</span></div>`;
+  }
+
+  const ROAD=[
+    {l:'A2 bitti',d:'Mart',s:'done'},{l:'B1 başlangıç',d:'Mayıs',s:'done'},
+    {l:'B1 sınavı',d:'Tem · şimdi',s:'now'},{l:'B2 hazırlık',d:'Ağu',s:''},{l:'B2 sınavı',d:'Eylül',s:''}
+  ];
+
+  function mountMain(){
+    content.innerHTML='';content.appendChild(document.getElementById('tpl-main').content.cloneNode(true));
+    document.getElementById('hcRing').innerHTML=LifeOS.ring(24,84,7,{fontSize:28})+'<div class="delta">↓ 46 puan / 30 gün</div>';
+    document.getElementById('hcMsg').innerHTML=LifeOS.icon('info')+'<span><b>Hayalin uzaklaşıyor.</b> Bu alan "Avrupa\'da yaşamak" hayaline bağlı — skor düştükçe hayal görselin soluyor.</span>';
+    document.getElementById('roadIc').innerHTML=LifeOS.icon('target');
+    document.getElementById('setIc').innerHTML=LifeOS.icon('settings');
+    document.getElementById('visIcon').innerHTML=LifeOS.icon('vision');
+    // roadmap
+    const doneCount=ROAD.filter(n=>n.s==='done').length;const fillPct=(doneCount+0.5)/(ROAD.length-1)*100*0.84;
+    document.getElementById('track').innerHTML=`<div class="fill" style="width:${Math.min(fillPct,88)}%"></div>`+ROAD.map(n=>`
+      <div class="node ${n.s}"><div class="pt">${n.s==='done'?LifeOS.icon('check'):(n.s==='now'?'●':ROAD.indexOf(n)+1)}</div><div class="nl">${n.l}</div><div class="nd">${n.d}</div></div>`).join('');
+    document.getElementById('chartWrap').innerHTML=lineChart(scoreData);
+    // tabs
+    setTab('proj');
+    document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>{
+      document.querySelectorAll('#tabs button').forEach(x=>x.classList.toggle('on',x===b));setTab(b.dataset.t);});
+  }
+
+  function setTab(t){
+    const body=document.getElementById('tabBody');
+    if(t==='proj'){
+      body.innerHTML=`<div class="proj-row">
+        <div class="pic">${LifeOS.icon('projects')}</div>
+        <div class="pi"><div class="pn">B1 sınavına hazırlık</div>
+          <div class="pbar"><i style="width:25%"></i></div>
+          <div class="pmeta">2/8 görev · son tarih 12 Tem</div></div>
+        <span class="badge b-iris">Aktif</span>
+        <span class="pprog tnum">25%</span></div>
+        <div style="padding:14px;text-align:center"><button class="btn sec sm">${LifeOS.icon('plus')} Proje ekle</button></div>`;
+    } else if(t==='task'){
+      const tasks=[{n:'Kelime listesi — 50 yeni kelime',p:'high',done:false},{n:'Dinleme egzersizi B1.2',p:'medium',done:false}];
+      body.innerHTML=tasks.map(t=>`<div class="task-line"><div class="tcheck ${t.done?'done':''}" onclick="this.classList.toggle('done')">${LifeOS.icon('check')}</div><span class="pri-dot pri-${t.p}" style="background:${t.p==='high'?'var(--h-crit)':'var(--h-good)'}"></span><span class="tn">${t.n}</span><span class="muted" style="font-size:12px">B1 hazırlık</span></div>`).join('')
+        +`<div style="padding:13px 8px;color:var(--ink-4);font-size:13px">+ Hızlı görev ekle…</div>`;
+    } else if(t==='hist'){
+      const h=[{t:'"Sıfat çekimleri" görevi tamamlandı',time:'8 gün önce',c:'#2E9E6B',pts:'+5'},
+        {t:'Skor 30 altına düştü — ihmal işareti',time:'5 gün önce',c:'#D2524A',pts:'uyarı'},
+        {t:'7 gün aktivite yok',time:'2 gün önce',c:'#DC7E33',pts:'−28'},
+        {t:'"B1 deneme sınavı" görevi tamamlandı',time:'14 May',c:'#2E9E6B',pts:'+10'}];
+      body.innerHTML=h.map(x=>`<div class="hist-item"><div class="hd" style="background:${x.c}"></div><div><div class="ht">${x.t}</div><div class="htime">${x.time}</div></div><span class="hpts" style="color:${x.c}">${x.pts}</span></div>`).join('');
+    } else if(t==='stat'){
+      body.innerHTML=`<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px">
+        ${[['Bu ay görev','9'],['Tamamlama oranı','64%'],['Ort. günlük skor','−4'],['En iyi gün','Salı'],['Toplam görev','47'],['Aktif gün','18/30']]
+        .map(s=>`<div style="border:1px solid var(--line);border-radius:11px;padding:14px"><div style="font-family:var(--mono);font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-4);margin-bottom:7px">${s[0]}</div><div style="font-size:20px;font-weight:600" class="tnum">${s[1]}</div></div>`).join('')}</div>`;
+    } else if(t==='vis'){
+      body.innerHTML=`<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        ${[['🇪🇺','Avrupa\'da yaşamak','2 alan bağlı · ort. skor 41','#D2524A'],['🗣️','Almanca B2','1 alan bağlı · ort. skor 24','#D2524A']]
+        .map(v=>`<a href="08-vision-board.html" style="text-decoration:none;border:1px solid var(--line-2);border-radius:12px;padding:16px;display:block">
+          <div style="font-size:26px;margin-bottom:10px">${v[0]}</div><div style="font-size:15px;font-weight:600;color:var(--ink)">${v[1]}</div>
+          <div style="font-size:12px;color:var(--ink-3);margin-top:4px">${v[2]}</div>
+          <div style="margin-top:12px;font-size:12px;color:${v[3]};font-weight:500">⚠ Bu hayal soluyor</div></a>`).join('')}</div>`;
+    }
+  }
+
+  function mountEmpty(){content.innerHTML='';content.appendChild(document.getElementById('tpl-empty').content.cloneNode(true));
+    document.getElementById('emptyArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><circle cx="48" cy="48" r="30" stroke="#A2E9DF" stroke-width="2"/><circle cx="48" cy="48" r="19" stroke="#A2E9DF" stroke-width="2" stroke-dasharray="4 5"/><circle cx="48" cy="48" r="4" fill="#0BA99B"/><path d="M48 18v8M48 70v8M18 48h8M70 48h8" stroke="#22BEB0" stroke-width="2.4" stroke-linecap="round"/></svg>`;}
+  function mountError(){content.innerHTML='';content.appendChild(document.getElementById('tpl-error').content.cloneNode(true));
+    document.getElementById('errArt').innerHTML=`<svg viewBox="0 0 96 96" fill="none"><path d="M20 56a14 14 0 0 1 8-25 18 18 0 0 1 34 3 12 12 0 0 1 4 22z" stroke="#D2524A" stroke-width="2.2" fill="#FBE7E5"/><path d="M48 44v10M48 62h.01" stroke="#D2524A" stroke-width="2.8" stroke-linecap="round"/></svg>`;}
+
+  LifeOS.stateSwitch([{id:'main',label:'Ana hal'},{id:'empty',label:'Boş'},{id:'error',label:'Hata'}]);
+  const sw=document.querySelector('.state-switch');
+  sw.querySelectorAll('button').forEach(b=>b.onclick=()=>{sw.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));({main:mountMain,empty:mountEmpty,error:mountError})[b.dataset.st]();});
+  mountMain();
+</script>
+</body>
+</html>
